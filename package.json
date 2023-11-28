@@ -1,0 +1,30 @@
+{
+  "name": "backend-gallery-walk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start":"node server",
+    "dev": "nodemon server"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Panthonf/backend-gallery-walk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Panthonf/backend-gallery-walk/issues"
+  },
+  "homepage": "https://github.com/Panthonf/backend-gallery-walk#readme",
+  "dependencies": {
+    "fastify": "^4.24.3",
+    "fastify-swagger": "^5.2.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
