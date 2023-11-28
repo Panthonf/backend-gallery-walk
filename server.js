@@ -7,7 +7,7 @@ const fastify = Fastify({
 import { items } from "./Items.js";
 
 // Declare a route
-fastify.get("/", (request, reply) => {
+fastify.get("/items", (request, reply) => {
   reply.send(items);
 });
 
