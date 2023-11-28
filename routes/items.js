@@ -1,6 +1,14 @@
-import { items } from "../Items.js";
+import { getItems, getItem } from "../controllers/itemsController.js";
 
-// I
+// Item schema
+const Item = {
+  type: "object",
+  properties: {
+    id: { type: "number" },
+    name: { type: "string" },
+    price: { type: "number" },
+  },
+};
 
 // Options for get all items
 const getItemsOpts = {
@@ -8,47 +16,25 @@ const getItemsOpts = {
     response: {
       200: {
         type: "array",
-        items: {
-          type: "object",
-          properties: {
-            id: { type: "number" },
-            name: { type: "string" },
-            price: { type: "integer" },
-          },
-        },
+        items: Item,
       },
     },
   },
+  handler: getItems,
 };
 
 const getItemOpts = {
   schema: {
     response: {
-      200: {
-        type: "object",
-        properties: {
-          id: { type: "number" },
-          name: { type: "string" },
-          price: { type: "number" },
-        },
-      },
+      200: Item,
     },
   },
+  handler: getItem,
 };
 
 function itemRoutes(fastify, options, done) {
-  // GET /items
-  fastify.get("/items", getItemsOpts, (request, reply) => {
-    reply.send(items);
-  });
-
-  // GET /items/:id
-  fastify.get("/items/:id", getItemOpts, (request, reply) => {
-    const { id } = request.params;
-    const item = items.find((item) => item.id === Number(id));
-    reply.send(item);
-  });
-
+  fastify.get("/items", getItemsOpts);
+  fastify.get("/items/:id", getItemOpts);
   done();
 }
 
