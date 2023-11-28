@@ -3,6 +3,16 @@ const fastify = Fastify({
   logger: true,
 });
 
+await fastify.register(import('@fastify/swagger'))
+
+fastify.register(import("@fastify/swagger-ui"), {
+  exposeRoute: true,
+  routePrefix: "/docs",
+  swagger: {
+    info: { title: "Gallery Walk Api" },
+  },
+});
+
 fastify.register(import("./routes/items.js"));
 
 const PORT = process.env.PORT || 3000;
