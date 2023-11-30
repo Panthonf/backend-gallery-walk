@@ -7,6 +7,7 @@ const fastify = Fastify({
   logger: true,
 });
 
+const port = 8080;
 fastify.get("/", function (request, reply) {
   reply.send({ hello: "jjjjjjjjjjjjjjjjjjjjj" });
 });
@@ -23,9 +24,9 @@ const start = async () => {
     await configureAuth(fastify);
 
     // Start the server
-    await fastify.listen({ port: 8080, host: "0.0.0.0" });
+    await fastify.listen({ port: port, host: "0.0.0.0" });
 
-    console.log(`Server listening at http://localhost:8080`);
+    console.log(`Server listening at http://localhost:${port}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
