@@ -11,6 +11,10 @@ fastify.get("/", function (request, reply) {
   reply.send({ hello: "jjjjjjjjjjjjjjjjjjjjj" });
 });
 
+fastify.get("/test", function (request, reply) {
+  reply.send({ hello: "test" });
+});
+
 fastify.register(exampleRoutes);
 
 const start = async () => {
@@ -19,7 +23,7 @@ const start = async () => {
     await configureAuth(fastify);
 
     // Start the server
-    await fastify.listen({ port: 8080, host: "0.0.0.0"});
+    await fastify.listen({ port: 8080, host: "0.0.0.0" });
 
     console.log(`Server listening at http://localhost:8080`);
   } catch (err) {
