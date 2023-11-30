@@ -1,15 +1,5 @@
 {
     "version": 2,
-    "builds": [
-      {
-        "src": "tsconfig.json",
-        "use": "@now/static-build"
-      },
-      {
-        "src": "src/**/*.ts",
-        "use": "@now/node"
-      }
-    ],
     "routes": [
       {
         "src": "/.*",
