@@ -24,7 +24,7 @@ async function configureAuth(fastify: FastifyInstance) {
     // register a fastify url to start the redirect flow
     startRedirectPath: "/google-login",
     // Google redirect here after the user login
-    callbackUri: "http://localhost:8080/google-login/callback" || "https://backend-gallery-walk-panthonf.vercel.app/google-login/callback",
+    callbackUri: "http://localhost:8080/google-login/callback",
   });
 
   fastify.get(
