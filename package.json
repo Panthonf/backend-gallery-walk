@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --exit-child ./src/server.ts",
-    "start": "npm run build && node ./build/server.js",
-    "build": "tsc",
+    "start": "tsc && node ./build/server.js",
     "prisma:generate": "prisma generate"
   },
   "repository": {
