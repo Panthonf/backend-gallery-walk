@@ -7,7 +7,8 @@ const fastify = Fastify({
   logger: true,
 });
 
-const port = 8080;
+const port = process.env.PORT as any || 8080;
+
 fastify.get("/", function (request, reply) {
   reply.send({ hello: "Aaaa" });
 });
