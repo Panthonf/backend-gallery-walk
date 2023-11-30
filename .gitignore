@@ -132,3 +132,4 @@ dist
 # docker-compose
 docker-compose.yml
 Dockerfile
+.vercel
