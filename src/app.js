@@ -4,7 +4,6 @@ dotenv.config();
 const server = Fastify({ logger: true });
 
 await server.register(import("@fastify/swagger"));
-
 await server.register(import("@fastify/swagger-ui"), {
   routePrefix: "/docs",
   uiConfig: {
