@@ -2,9 +2,15 @@ import server from "./app.js";
 
 const PORT = process.env.PORT || 3000;
 
-server.get("/", async (request, reply) => {
-  return { hello: "world" };
-});
+server.get(
+  "/",
+  { schema: { tags: ["API", "Home"] } },
+  async (request, reply) => {
+    return {
+      message: "Welcome to the Fastify API",
+    };
+  }
+);
 
 const start = async () => {
   try {
