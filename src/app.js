@@ -5,7 +5,7 @@ const server = Fastify({ logger: true });
 
 await server.register(import("@fastify/swagger"));
 await server.register(import("@fastify/swagger-ui"), {
-  routePrefix: "/docs",
+  routePrefix: "/api",
   uiConfig: {
     docExpansion: "full",
     deepLinking: false,
