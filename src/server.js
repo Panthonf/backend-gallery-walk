@@ -1,7 +1,6 @@
 import server from "./app.js";
-import oauthPlugin from "@fastify/oauth2";
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 server.get("/", async (req, res) => {
   return {
