@@ -1,5 +1,7 @@
 import oauthPlugin from "@fastify/oauth2";
 
+const CALLBACK_URI = process.env.CALLBACK_URI || "http://localhost:8080/login/google/callback";
+
 export default async (fastify) => {
   const oauthOptions = {
     scope: ["profile", "email"],
@@ -14,7 +16,7 @@ export default async (fastify) => {
     // register a fastify url to start the redirect flow
     startRedirectPath: "/login/google",
     // facebook redirect here after the user login
-    callbackUri: "http://localhost:3000/login/google/callback",
+    callbackUri: CALLBACK_URI,
   };
 
     fastify.register(oauthPlugin, oauthOptions);
