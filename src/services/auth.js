@@ -29,12 +29,7 @@ export default async (fastify) => {
 
     console.log(token.access_token);
 
-    reply.setCookie("token", token.access_token, {
-      path: "/",
-      domain: "localhost" || "0.0.0.0",
-      httpOnly: true,
-      secure: true,
-    });
+    reply.setCookie("token", token.access_token);
 
     // if later you need to refresh the token you can use
     // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
