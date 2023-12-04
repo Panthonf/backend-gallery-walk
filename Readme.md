@@ -1,6 +1,6 @@
-# Your Fastify Project
+# Gallery Walk
 
-Brief description of your project.
+Gallery Walk is a web application that allows users to create and share their own project. Users can also view other users' projects and leave comments on them.
 
 ## Getting Started
 
@@ -18,4 +18,18 @@ Make sure you have Node.js and npm installed on your machine.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/your-fastify-project.git
+    git clone https://github.com/Panthonf/backend-gallery-walk.git
+
+    cd backend-gallery-walk
+    ```
+2. Install dependencies:
+   
+   ```bash
+   npm install
+   ```
+3. Start the server:
+   ```bash
+    npm run dev
+    ```
+4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+5. Open [http://localhost:3000/api](http://localhost:3000/api) to view the API in the browser.
