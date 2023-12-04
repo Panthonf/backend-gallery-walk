@@ -1,6 +1,7 @@
 import oauthPlugin from "@fastify/oauth2";
 
-const CALLBACK_URI = process.env.CALLBACK_URI || "http://localhost:8080/login/google/callback";
+const CALLBACK_URI =
+  process.env.CALLBACK_URI || "http://localhost:3000/login/google/callback";
 
 export default async (fastify) => {
   const oauthOptions = {
@@ -19,17 +20,24 @@ export default async (fastify) => {
     callbackUri: CALLBACK_URI,
   };
 
-    fastify.register(oauthPlugin, oauthOptions);
+  fastify.register(oauthPlugin, oauthOptions);
 
-    fastify.get("/login/google/callback", async function (request, reply) {
-        const { token } =
-          await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
-      
-        console.log(token.access_token);
-      
-        // if later you need to refresh the token you can use
-        // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
-      
-        reply.send({ access_token: token.access_token });
-      });
+  fastify.get("/login/google/callback", async function (request, reply) {
+    const { token } =
+      await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
+
+    console.log(token.access_token);
+
+    reply.setCookie("token", token.access_token, {
+      path: "/",
+      domain: "localhost",
+      httpOnly: true,
+      secure: true,
+    });
+
+    // if later you need to refresh the token you can use
+    // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
+
+    reply.send({ access_token: token.access_token });
+  });
 };
