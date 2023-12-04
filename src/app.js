@@ -31,4 +31,6 @@ await server.register(import("@fastify/swagger-ui"), {
 server.register(import("./routes/userRoutes.js"), { prefix: "/api" });
 // fastify.register(require('./routes/productRoutes'));
 
+server.register(import("./services/auth.js"));
+
 export default server;

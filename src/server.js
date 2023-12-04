@@ -1,16 +1,13 @@
 import server from "./app.js";
+import oauthPlugin from "@fastify/oauth2";
 
 const PORT = process.env.PORT || 8080;
 
-server.get(
-  "/",
-  { schema: { tags: ["API", "Home"] } },
-  async (request, reply) => {
-    return {
-      message: "Welcome to the Fastify API",
-    };
-  }
-);
+server.get("/", async (req, res) => {
+  return {
+    Welcome: "Welcome to the Fastify API",
+  };
+});
 
 const start = async () => {
   try {
