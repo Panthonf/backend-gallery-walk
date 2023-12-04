@@ -39,7 +39,10 @@ export default async (fastify) => {
     // if later you need to refresh the token you can use
     // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
 
-    reply.send({ access_token: token.access_token });
+    reply.send({
+      access_token: token.access_token,
+      token_type: token.token_type,
+    });
   });
 
   const isLoggedIn = async (request, reply) => {
