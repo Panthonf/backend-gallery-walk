@@ -1,6 +1,7 @@
 import server from "./app.js";
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "localhost";
 
 server.get("/", async (req, res) => {
   return {
@@ -10,7 +11,7 @@ server.get("/", async (req, res) => {
 
 const start = async () => {
   try {
-    await server.listen({ port: PORT, host: "0.0.0.0" });
+    await server.listen({ port: PORT, host: HOST });
     console.log(
       `Server listening on port http://localhost:${
         server.server.address().port
