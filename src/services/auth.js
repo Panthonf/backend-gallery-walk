@@ -31,8 +31,8 @@ export default async (fastify) => {
 
     reply.setCookie("token", token.access_token, {
       path: "/", // the cookie will be available for all routes in your app
-      httpOnly: true, // the cookie cannot be accessed from javascript
-      secure: true, 
+      httpOnly: true, // prevent cookie from being accessed by client-side APIs
+      secure: true, // cookie will only be sent over HTTPS
     });
 
     // if later you need to refresh the token you can use
