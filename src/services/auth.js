@@ -31,7 +31,7 @@ export default async (fastify) => {
 
     reply.setCookie("token", token.access_token, {
       path: "/",
-      domain: "localhost",
+      domain: "localhost" || "0.0.0.0",
       httpOnly: true,
       secure: true,
     });
