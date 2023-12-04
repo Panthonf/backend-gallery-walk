@@ -1,5 +1,7 @@
 import server from "./app.js";
 
+const PORT = process.env.PORT || 3000;
+
 server.get("/", async (req, res) => {
   return {
     Welcome: "Welcome to the Fastify API",
@@ -9,7 +11,7 @@ server.get("/", async (req, res) => {
 const start = async () => {
   try {
     await server.listen({
-      port: process.env.PORT || 3000,
+      port: PORT,
       host: "0.0.0.0",
     });
     console.log(
