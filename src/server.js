@@ -11,8 +11,7 @@ server.get("/", async (req, res) => {
 const start = async () => {
   try {
     await server.listen({
-      port: PORT,  
-      host: "0.0.0.0",
+      port: PORT, host: "0.0.0.0",
     });
     console.log(
       `Server listening on port http://localhost:${
