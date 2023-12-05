@@ -1,7 +1,19 @@
 import Fastify from "fastify";
 import dotenv from "dotenv";
+import isLoggedIn from "./services/isLoggedIn.js";
 dotenv.config();
 const server = Fastify({ logger: true });
+
+server.register(import("@fastify/cookie"));
+server.decorate("isLoggedIn", isLoggedIn);
+
+server.get(
+  "/demo",
+  { preValidation: [server.isLoggedIn] },
+  async (req, reply) => {
+    reply.send({ message: "You are logged in" });
+  }
+);
 
 await server.register(import("@fastify/swagger"));
 await server.register(import("@fastify/swagger-ui"), {

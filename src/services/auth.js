@@ -44,18 +44,13 @@ export default async (fastify) => {
     });
   });
 
-  const isLoggedIn = async (request, reply) => {
+  function isLoggedIn(request, reply, done) {
     const { token } = request.cookies;
-
     if (!token) {
-      reply.code(401).send({ message: "You are not logged in" });
-      return false;
+      reply.code(401).send({ error: "Unauthorized" });
     }
-
-    return true;
-  };
-
-  fastify.decorate("isLoggedIn", isLoggedIn);
+    done();
+  }
 
   fastify.get(
     "/user",

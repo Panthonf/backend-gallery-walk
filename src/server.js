@@ -8,10 +8,23 @@ server.get("/", async (req, res) => {
   };
 });
 
+server.get(
+  "/test",
+  {
+    preValidation: [server.isLoggedIn],
+  },
+  async (req, res) => {
+    return {
+      test: "test",
+    };
+  }
+);
+
 const start = async () => {
   try {
     await server.listen({
-      port: PORT, host: "0.0.0.0",
+      port: PORT,
+      host: "0.0.0.0",
     });
     console.log(
       `Server listening on port http://localhost:${
