@@ -33,6 +33,7 @@ export default async (fastify) => {
       path: "/", // the cookie will be available for all routes in your app
       httpOnly: true, // prevent cookie from being accessed by client-side APIs
       secure: true, // cookie will only be sent over HTTPS
+      expires: new Date(Date.now() + 120000), // cookie expires in 1 hour
     });
 
     // if later you need to refresh the token you can use
@@ -41,16 +42,43 @@ export default async (fastify) => {
     reply.send({
       access_token: token.access_token,
       token_type: token.token_type,
+      expire: token.expires_in,
     });
   });
 
-  function isLoggedIn(request, reply, done) {
-    const { token } = request.cookies;
-    if (!token) {
-      reply.code(401).send({ error: "Unauthorized" });
-    }
-    done();
-  }
+  fastify.register(oauthPlugin, {
+    name: "facebookOAuth2",
+    scope: ["email"],
+    credentials: {
+      client: {
+        id: "854047730061591",
+        secret: "0d15ad5e104e3f5d85a3f925ddfca99b",
+      },
+      auth: oauthPlugin.FACEBOOK_CONFIGURATION,
+    },
+    startRedirectPath: "/login/facebook",
+    callbackUri: "http://localhost:8080/login/facebook/callback",
+  });
+
+  fastify.get("/login/facebook/callback", async function (request, reply) {
+    const { token } =
+      await this.facebookOAuth2.getAccessTokenFromAuthorizationCodeFlow(
+        request
+      );
+
+    reply.setCookie("token", token.access_token, {
+      path: "/", // the cookie will be available for all routes in your app
+      httpOnly: true, // prevent cookie from being accessed by client-side APIs
+      secure: true, // cookie will only be sent over HTTPS
+      expires: new Date(Date.now() + 120000), // cookie expires in 1 hour
+    });
+
+    reply.send({
+      access_token: token.access_token,
+      token_type: token.token_type,
+      expire: token.expires_in,
+    });
+  });
 
   fastify.get(
     "/user",
