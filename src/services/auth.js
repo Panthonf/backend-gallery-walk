@@ -57,7 +57,7 @@ export default async (fastify) => {
       auth: oauthPlugin.FACEBOOK_CONFIGURATION,
     },
     startRedirectPath: "/login/facebook",
-    callbackUri: "http://localhost:8080/login/facebook/callback",
+    callbackUri: process.env.CALLBACK_URI_FACEBOOK,
   });
 
   fastify.get("/login/facebook/callback", async function (request, reply) {
