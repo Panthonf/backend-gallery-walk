@@ -11,24 +11,24 @@ datasource db {
 }
 
 model User {
-  id    Int    @id @default(autoincrement())
+  id    Int     @id @default(autoincrement())
   email String  @unique
   name  String?
 }
 
 model Event {
-  id             Int      @id @default(autoincrement())
-  eventName      String
-  startDate      DateTime
-  endDate        DateTime
-  assistantEmail String[]
-  description    String
-  submitStart    DateTime
-  submitEnd      DateTime
-  numberOfMember Int
-  virtualMoney   Int
-  unitMoney      String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  createdById    Int
+  id                 Int      @id @default(autoincrement())
+  event_name         String
+  start_date         DateTime
+  end_date           DateTime
+  assistant_emails   String[]
+  description        String
+  submit_start       DateTime
+  submit_end         DateTime
+  number_of_member   Int
+  virtual_money      Int
+  unit_money         String
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  created_by_user_id Int   
 }
