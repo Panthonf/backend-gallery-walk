@@ -70,7 +70,7 @@ export default async (fastify) => {
       path: "/", // the cookie will be available for all routes in your app
       httpOnly: true, // prevent cookie from being accessed by client-side APIs
       secure: true, // cookie will only be sent over HTTPS
-      expires: new Date(Date.now() + 120000), // cookie expires in 1 hour
+      expires: new Date(Date.now() + 3600000), // cookie expires in 1 hour
     });
 
     reply.send({
@@ -86,17 +86,32 @@ export default async (fastify) => {
     async (request, reply) => {
       try {
         const { token } = request.cookies;
-        const { data } = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
 
-        const { name, email, picture } = data;
-        reply.send({ name, email, picture });
+        try {
+          const { data } = await axios.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          reply.send({
+            userInfo: data,
+          });
+        } catch (error) {
+          const userInfo = await axios.get(
+            "https://graph.facebook.com/v12.0/me?fields=id,name,email",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          reply.send({
+            userInfo: userInfo.data,
+          });
+        }
       } catch (error) {
         console.error("Error fetching user info:", error);
         reply.code(500).send({ message: "Internal Server Error" });
