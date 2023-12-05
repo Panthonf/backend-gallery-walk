@@ -101,7 +101,7 @@ export default async (fastify) => {
           });
         } catch (error) {
           const userInfo = await axios.get(
-            "https://graph.facebook.com/v12.0/me?fields=id,name,email",
+            "https://graph.facebook.com/v12.0/me?fields=id,name,email,picture",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -110,6 +110,7 @@ export default async (fastify) => {
           );
           reply.send({
             userInfo: userInfo.data,
+            message: "Logged in with Facebook",
           });
         }
       } catch (error) {
