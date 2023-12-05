@@ -1,9 +1,9 @@
-import userService from "../services/userService.js";
+import userModel from "../models/userModel.js";
 
 export default {
   getAllUsers: async (request, reply) => {
     try {
-      const users = await userService.getAllUsers();
+      const users = await userModel.getAllUsers();
       reply.send(users);
     } catch (error) {
       console.error(error);
@@ -13,7 +13,7 @@ export default {
   getUserById: async (request, reply) => {
     const userId = parseInt(request.params.id);
     try {
-      const user = await userService.getUserById(userId);
+      const user = await userModel.getUserById(userId);
       if (user) {
         reply.send(user);
       } else {
@@ -27,7 +27,7 @@ export default {
   createUser: async (request, reply) => {
     const userData = request.body;
     try {
-      const newUser = await userService.createUser(userData);
+      const newUser = await userModel.createUser(userData);
       reply.status(201).send({
         success: true,
         message: "User created successfully",
@@ -47,7 +47,7 @@ export default {
     const userId = parseInt(request.params.id);
     const updatedUserData = request.body;
     try {
-      const updatedUser = await userService.updateUser(userId, updatedUserData);
+      const updatedUser = await userModel.updateUser(userId, updatedUserData);
       if (updatedUser) {
         reply.send({
           success: true,
@@ -72,7 +72,7 @@ export default {
   deleteUser: async (request, reply) => {
     const userId = parseInt(request.params.id);
     try {
-      const deletedUser = await userService.deleteUser(userId);
+      const deletedUser = await userModel.deleteUser(userId);
       if (deletedUser) {
         reply.send({
           success: true,

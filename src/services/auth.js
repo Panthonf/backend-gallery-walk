@@ -33,7 +33,7 @@ export default async (fastify) => {
       path: "/", // the cookie will be available for all routes in your app
       httpOnly: true, // prevent cookie from being accessed by client-side APIs
       secure: true, // cookie will only be sent over HTTPS
-      expires: new Date(Date.now() + 120000), // cookie expires in 1 hour
+      expires: new Date(Date.now() + 3600000), // cookie expires in 1 hour
     });
 
     // if later you need to refresh the token you can use
@@ -101,7 +101,7 @@ export default async (fastify) => {
           });
         } catch (error) {
           const userInfo = await axios.get(
-            "https://graph.facebook.com/v12.0/me?fields=id,name,email,picture",
+            "https://graph.facebook.com/v18.0/me?fields=id,name,email,picture,birthday,friends,first_name,last_name",
             {
               headers: {
                 Authorization: `Bearer ${token}`,

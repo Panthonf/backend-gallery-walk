@@ -40,7 +40,8 @@ await server.register(import("@fastify/swagger-ui"), {
 });
 
 // Include your routes
-server.register(import("./routes/userRoutes.js"), { prefix: "/api" });
+server.register(import("./routes/userRoutes.js"), { prefix: "/users" });
+server.register(import("./routes/eventRoute.js"), { prefix: "/events" });
 // fastify.register(require('./routes/productRoutes'));
 
 server.register(import("./services/auth.js"));
