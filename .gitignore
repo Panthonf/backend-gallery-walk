@@ -133,3 +133,10 @@ dist
 docker-compose.yml
 Dockerfile
 .vercel
+
+
+# Prisma
+/prisma/migrations
+
+
+.vscode
