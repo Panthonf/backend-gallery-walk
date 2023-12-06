@@ -29,6 +29,16 @@ export default async (fastify) => {
 
     console.log(token.access_token);
 
+    const { data } = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+
+      {
+        headers: {
+          Authorization: `Bearer ${token.access_token}`,
+        },
+      }
+    );
+
     reply.setCookie("token", token.access_token, {
       path: "/", // the cookie will be available for all routes in your app
       httpOnly: true, // prevent cookie from being accessed by client-side APIs
@@ -40,9 +50,10 @@ export default async (fastify) => {
     // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
 
     reply.send({
-      access_token: token.access_token,
-      token_type: token.token_type,
-      expire: token.expires_in,
+      // access_token: token.access_token,
+      // token_type: token.token_type,
+      // expire: token.expires_in,
+      userInfo: data,
     });
   });
 
@@ -66,6 +77,25 @@ export default async (fastify) => {
         request
       );
 
+    const userInfo = await axios.get(
+      "https://graph.facebook.com/v18.0/me?fields=id,name,email,picture.type(large),birthday,friends,first_name,last_name",
+
+      {
+        headers: {
+          Authorization: `Bearer ${token.access_token}`,
+        },
+      }
+    );
+
+    const profile_pic = await axios.get(
+      `https://graph.facebook.com/v18.0/${userInfo.data.id}/picture?redirect=false&access_token=${token.access_token}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token.access_token}`,
+        },
+      }
+    );
+
     reply.setCookie("token", token.access_token, {
       path: "/", // the cookie will be available for all routes in your app
       httpOnly: true, // prevent cookie from being accessed by client-side APIs
@@ -74,9 +104,11 @@ export default async (fastify) => {
     });
 
     reply.send({
-      access_token: token.access_token,
-      token_type: token.token_type,
-      expire: token.expires_in,
+      // access_token: token.access_token,
+      // token_type: token.token_type,
+      // expire: token.expires_in,
+      userInfo: userInfo.data,
+      profile_pic: profile_pic.data,
     });
   });
 
