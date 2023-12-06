@@ -26,4 +26,10 @@ export default {
       where: { id: userId },
     });
   },
+
+  checkUser: async (email) => {
+    return prisma.user.findUnique({
+      where: { email: email },
+    });
+  },
 };

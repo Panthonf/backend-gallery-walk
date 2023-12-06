@@ -1,11 +1,14 @@
 import oauthPlugin from "@fastify/oauth2";
 import axios from "axios";
+import userController from "../controllers/userController.js";
+import userModel from "../models/userModel.js";
 
 const CALLBACK_URI =
   process.env.CALLBACK_URI || "http://localhost:3000/login/google/callback";
 
 export default async (fastify) => {
-  const oauthOptions = {
+  // Google login
+  fastify.register(oauthPlugin, {
     scope: ["profile", "email"],
     name: "googleOAuth2",
     credentials: {
@@ -19,9 +22,7 @@ export default async (fastify) => {
     startRedirectPath: "/login/google",
     // facebook redirect here after the user login
     callbackUri: CALLBACK_URI,
-  };
-
-  fastify.register(oauthPlugin, oauthOptions);
+  });
 
   fastify.get("/login/google/callback", async function (request, reply) {
     const { token } =
@@ -49,14 +50,33 @@ export default async (fastify) => {
     // if later you need to refresh the token you can use
     // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
 
+    const userInfo = JSON.parse(JSON.stringify(data));
+    const checkUser = await userModel.checkUser(userInfo.email);
+    reply.send({ checkUser });
+
+    if (!(await userModel.checkUser(email))) {
+      const newUser = await userController.createUser(userInfo);
+      if (newUser) {
+        reply.send({
+          success: true,
+          message: "User created successfully",
+          data: newUser,
+          new_user: true,
+        });
+      } else {
+        reply.send({ error: "Internal Server Error" });
+      }
+    }
+
     reply.send({
-      // access_token: token.access_token,
-      // token_type: token.token_type,
-      // expire: token.expires_in,
-      userInfo: data,
+      success: true,
+      message: "User logged in successfully",
+      data: userInfo,
+      new_user: false,
     });
   });
 
+  // Facebook login
   fastify.register(oauthPlugin, {
     name: "facebookOAuth2",
     scope: ["email"],
