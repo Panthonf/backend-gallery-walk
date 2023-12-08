@@ -72,13 +72,4 @@ createTableIfNotExists(
   `
 );
 
-const query = `ALTER TABLE public."Event" ALTER COLUMN unit_money SET NOT NULL`;
-pool.query(query, (err, res) => {
-  if (err) {
-    console.error("Error connecting to PostgreSQL:", err.message);
-  } else {
-    console.log("Dropped table successfully.");
-  }
-});
-
 export default pool;
