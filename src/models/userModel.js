@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
 import pool from "../db/db.js";
-const prisma = new PrismaClient();
 
 async function getAllUsers() {
   const query = 'SELECT * FROM public."User"';
