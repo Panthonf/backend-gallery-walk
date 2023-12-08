@@ -9,7 +9,19 @@ import {
 async function getAllUsersController(request, reply) {
   try {
     const users = await getAllUsers();
-    reply.send(users);
+    if (users) {
+      reply.send({
+        success: true,
+        message: "Users fetched successfully",
+        data: users,
+      });
+    } else {
+      reply.status(404).send({
+        success: false,
+        message: "Users not found",
+        data: null,
+      });
+    }
   } catch (error) {
     console.error(error);
     reply.status(500).send({
@@ -23,7 +35,7 @@ async function getAllUsersController(request, reply) {
 async function createUserController(request, reply, done) {
   const userData = request.body;
 
-  if (await getUserByEmail(userData.email)!=null) {
+  if ((await getUserByEmail(userData.email)) != null) {
     reply.status(409).send({
       success: false,
       message: "User already exists",
