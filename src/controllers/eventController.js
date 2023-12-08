@@ -1,50 +1,122 @@
-import eventModel from "../models/eventModel.js";
+import {
+  getAllEvents,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+  getEventByUserId,
+} from "../models/eventModel.js";
 
-export default {
-  getAllEvents: async (request, reply) => {
-    const events = await eventModel.getAllEvents();
+async function getAllEventsController(request, reply) {
+  try {
+    const events = await getAllEvents();
     reply.send(events);
-  },
-  getEventById: async (request, reply) => {
-    const event = await eventModel.getEventById(request.params.id);
-    reply.send(event);
-  },
-  createEvent: async (request, reply) => {
-    const event = await eventModel.createEvent(request.body);
-    if (!event) {
-      reply.status(500).send({ error: "Internal Server Error" });
-    }
-
-    reply.send({
-      success: true,
-      message: "Event created successfully",
-      data: event,
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
     });
-  },
-  updateEvent: async (request, reply) => {
-    const event = await eventModel.updateEvent(request.params.id, request.body);
-    reply.send(event);
-  },
-  deleteEvent: async (request, reply) => {
-    const event = await eventModel.deleteEvent(request.params.id);
-    reply.send(event);
-  },
-
-  getEventByUserId: async (request, reply) => {
-    const events = await eventModel.getEventByUserId(request.params.userId);
-    if(events.length === 0) {
-      reply.status(404).send(
-        {
-          success: false,
-          message: "User not found",
-        }
-      );
-    }
-    reply.send({
-      success: true,
-      message: "Event created successfully",
-      length: events.length,
-      data: events,
-    })
   }
+}
+
+async function createEventController(request, reply, done) {
+  try {
+    const eventData = request.body;
+    const event = await createEvent(eventData);
+    if (event) {
+      reply.status(201).send({
+        success: true,
+        message: "Event created successfully",
+        data: event,
+      });
+    } else {
+      reply.status(500).send({
+        success: false,
+        message: "Internal Server Error",
+        data: null,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+}
+
+async function updateEventController(request, reply, done) {
+  const eventId = parseInt(request.params.id);
+  const updatedEventData = request.body;
+  try {
+    const event = await updateEvent(eventId, updatedEventData);
+    if (event) {
+      reply.send(event);
+    } else {
+      reply.status(404).send({
+        success: false,
+        message: "Event not found",
+        data: null,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+}
+
+async function deleteEventController(request, reply, done) {
+  const eventId = parseInt(request.params.id);
+  try {
+    const deletedEvent = await deleteEvent(eventId);
+    if (deletedEvent) {
+      reply.send({
+        success: true,
+        message: `Event "${deletedEvent.event_name}" deleted successfully`,
+        data: null,
+      });
+    } else {
+      reply.status(404).send({
+        success: false,
+        message: `Event with id ${eventId} not found`,
+        data: null,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      data: null,
+    });
+  }
+}
+
+async function getEventByUserIdController(request, reply, done) {
+  const userId = parseInt(request.params.userId);
+  try {
+    const events = await getEventByUserId(userId);
+    reply.send(events);
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+}
+
+export {
+  getAllEventsController,
+  createEventController,
+  updateEventController,
+  deleteEventController,
+  getEventByUserIdController,
 };

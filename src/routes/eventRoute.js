@@ -1,4 +1,10 @@
-import eventController from "../controllers/eventController.js";
+import {
+  getAllEventsController,
+  createEventController,
+  updateEventController,
+  deleteEventController,
+  getEventByUserIdController,
+} from "../controllers/eventController.js";
 
 const schema = {
   body: {
@@ -33,10 +39,9 @@ const schema = {
 };
 
 export default async (fastify) => {
-  fastify.get("/", eventController.getAllEvents);
-  fastify.get("/:id", eventController.getEventById);
-  fastify.get("/user/:userId", eventController.getEventByUserId);
-  fastify.post("/", { schema }, eventController.createEvent);
-  fastify.put("/:id", eventController.updateEvent);
-  fastify.delete("/:id", eventController.deleteEvent);
+  fastify.get("/", getAllEventsController);
+  fastify.get("/user/:userId", getEventByUserIdController);
+  fastify.post("/", { schema }, createEventController);
+  fastify.put("/:id", updateEventController);
+  fastify.delete("/:id", deleteEventController);
 };

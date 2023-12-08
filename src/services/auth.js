@@ -1,7 +1,6 @@
 import oauthPlugin from "@fastify/oauth2";
 import axios from "axios";
-import userController from "../controllers/userController.js";
-import userModel from "../models/userModel.js";
+import { checkUser, createUser } from "../models/userModel.js";
 
 const CALLBACK_URI =
   process.env.CALLBACK_URI || "http://localhost:3000/login/google/callback";
@@ -50,12 +49,20 @@ export default async (fastify) => {
     // if later you need to refresh the token you can use
     // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
 
-    const userInfo = JSON.parse(JSON.stringify(data));
-    const checkUser = await userModel.checkUser(userInfo.email);
-    reply.send({ checkUser });
+    var userInfo = JSON.parse(JSON.stringify(data));
 
-    if (!(await userModel.checkUser(email))) {
-      const newUser = await userController.createUser(userInfo);
+    const user = {
+      first_name_th: userInfo.given_name,
+      last_name_th: userInfo.family_name,
+      first_name_en: userInfo.given_name,
+      last_name_en: userInfo.family_name,
+      email: userInfo.email,
+      profile_pic: userInfo.picture,
+      affiliation: "",
+    };
+
+    if (!await checkUser(userInfo.email)) {
+      const newUser = await createUser(user);
       if (newUser) {
         reply.send({
           success: true,
