@@ -1,26 +1,28 @@
 import pool from "../../db/db.js";
 
 async function getAllEvents() {
-  const query = 'SELECT * FROM public."Event"';
+  const query = 'SELECT * FROM public."Events"';
   const res = await pool.query(query);
   return res.rows;
 }
 
 async function createEvent(eventData) {
   const query =
-    'INSERT INTO public."Event" (event_name, description, start_date, end_date, assistant_emails, submit_start, submit_end, number_of_member, virtual_money, unit_money, created_by_user_id, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 , $11, $12) RETURNING *';
+    'INSERT INTO public."Events" (event_name, start_date, end_date, description, submit_start, submit_end, number_of_member, virtual_money, unit_money, published, organization, video_link, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, false, $10, $11, $12, $13, $14) RETURNING *';
   const res = await pool.query(query, [
     eventData.event_name,
-    eventData.description,
     eventData.start_date,
     eventData.end_date,
-    eventData.assistant_emails,
+    eventData.description,
     eventData.submit_start,
     eventData.submit_end,
     eventData.number_of_member,
     eventData.virtual_money,
     eventData.unit_money,
-    eventData.created_by_user_id,
+    eventData.organization,
+    eventData.video_link,
+    eventData.user_id,
+    eventData.created_at,
     eventData.updated_at,
   ]);
   return res.rows[0];

@@ -6,10 +6,22 @@ import {
   getEventByUserId,
 } from "./models.js";
 
-async function getAllEventsController(request, reply) {
+async function getAllEventsService(request, reply) {
   try {
     const events = await getAllEvents();
-    reply.send(events);
+    if (events.length === 0) {
+      reply.status(404).send({
+        success: false,
+        message: "Data not found",
+        data: null,
+      });
+    } else {
+      reply.send({
+        success: true,
+        message: "Events fetched successfully",
+        data: events,
+      });
+    }
   } catch (error) {
     console.error(error);
     reply.status(500).send({
@@ -20,7 +32,7 @@ async function getAllEventsController(request, reply) {
   }
 }
 
-async function createEventController(request, reply, done) {
+async function createEventService(request, reply, done) {
   try {
     const eventData = request.body;
     const event = await createEvent(eventData);
@@ -114,8 +126,8 @@ async function getEventByUserIdController(request, reply, done) {
 }
 
 export {
-  getAllEventsController,
-  createEventController,
+  getAllEventsService,
+  createEventService,
   updateEventController,
   deleteEventController,
   getEventByUserIdController,
