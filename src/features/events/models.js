@@ -55,7 +55,7 @@ async function deleteEvent(eventId) {
 }
 
 async function getEventByUserId(userId) {
-  const query = 'SELECT * FROM public."Event" WHERE created_by_user_id = $1';
+  const query = 'SELECT * FROM public."Events" WHERE user_id = $1';
   const res = await pool.query(query, [userId]);
   return res.rows;
 }
