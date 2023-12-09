@@ -1,4 +1,4 @@
-import pool from "../db/db.js";
+import pool from "../../db/db.js";
 
 async function getAllUsers() {
   const query = 'SELECT * FROM public."User"';

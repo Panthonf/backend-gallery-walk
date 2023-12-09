@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import dotenv from "dotenv";
-import isLoggedIn from "./services/isLoggedIn.js";
+import isLoggedIn from "./middleware/isLoggedIn.js";
 dotenv.config();
 const server = Fastify({ logger: true });
 
@@ -40,10 +40,10 @@ await server.register(import("@fastify/swagger-ui"), {
 });
 
 // Include your routes
-server.register(import("./routes/userRoutes.js"), { prefix: "/users" });
-server.register(import("./routes/eventRoute.js"), { prefix: "/events" });
+server.register(import("./features/users/routes.js"), { prefix: "/users" });
+// server.register(import("./routes/eventRoute.js"), { prefix: "/events" });
 // fastify.register(require('./routes/productRoutes'));
 
-server.register(import("./services/auth.js"));
+server.register(import("./middleware/auth.js"));
 
 export default server;

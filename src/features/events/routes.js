@@ -4,7 +4,7 @@ import {
   updateEventController,
   deleteEventController,
   getEventByUserIdController,
-} from "../controllers/eventController.js";
+} from "./services.js";
 
 const schema = {
   body: {

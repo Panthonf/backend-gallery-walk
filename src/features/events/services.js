@@ -4,7 +4,7 @@ import {
   updateEvent,
   deleteEvent,
   getEventByUserId,
-} from "../models/eventModel.js";
+} from "./models.js";
 
 async function getAllEventsController(request, reply) {
   try {

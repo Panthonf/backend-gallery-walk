@@ -4,7 +4,7 @@ import {
   createUser,
   getUserById,
   getUserByEmail,
-} from "../models/userModel.js";
+} from "./models.js";
 
 async function getAllUsersController(request, reply) {
   try {

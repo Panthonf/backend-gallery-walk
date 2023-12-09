@@ -1,6 +1,6 @@
 import oauthPlugin from "@fastify/oauth2";
 import axios from "axios";
-import { checkUser, createUser } from "../models/userModel.js";
+import { checkUser, createUser } from "../features/users/models.js";
 
 const CALLBACK_URI =
   process.env.CALLBACK_URI || "http://localhost:3000/login/google/callback";

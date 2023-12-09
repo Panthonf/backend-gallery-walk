@@ -3,7 +3,7 @@ import {
   createUserController,
   deleteUserController,
   getUserByIdController,
-} from "../controllers/userController.js";
+} from "./services.js";
 
 export default async (fastify) => {
   fastify.get("/", getAllUsersController);
@@ -11,4 +11,9 @@ export default async (fastify) => {
   fastify.post("/", createUserController);
   // fastify.put("/:id", userController.updateUser);
   fastify.delete("/:id", deleteUserController);
+  fastify.get("/test", async (req, res) => {
+    return {
+      test: "test",
+    };
+  });
 };
