@@ -68,10 +68,8 @@ async function createTableIfNotExists(tableName, createTableQuery) {
   }
 }
 
-const query = `DROP TABLE IF EXISTS public."User" CASCADE;`;
-const query2 = `DROP TABLE IF EXISTS public."Event" CASCADE;`;
-
-async function dropTable(tableName, dropTableQuery) {
+async function dropTable(tableName) {
+  const dropTableQuery = `DROP TABLE IF EXISTS public."${tableName}" CASCADE;`;
   try {
     await pool.query(dropTableQuery);
     console.log(`${tableName} table dropped successfully.`);
@@ -80,8 +78,8 @@ async function dropTable(tableName, dropTableQuery) {
   }
 }
 
-dropTable(table_users, query);
-dropTable(table_events, query2);
+// dropTable(table_users);
+// dropTable(table_events);
 
 createTableIfNotExists(table_users, sql_create_users_table);
 createTableIfNotExists(table_events, sql_create_events_table);
