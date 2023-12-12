@@ -23,7 +23,7 @@ export default async (fastify) => {
     callbackUri: CALLBACK_URI,
   });
 
-  fastify.get("/login/google/callback", async function (request, reply) {
+  fastify.get("/login/google/callback", async function (request, reply, done) {
     const { token } =
       await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
 
@@ -39,12 +39,12 @@ export default async (fastify) => {
       }
     );
 
-    reply.setCookie("token", token.access_token, {
-      path: "/", // the cookie will be available for all routes in your app
-      httpOnly: true, // prevent cookie from being accessed by client-side APIs
-      secure: true, // cookie will only be sent over HTTPS
-      expires: new Date(Date.now() + 3600000), // cookie expires in 1 hour
-    });
+    // reply.setCookie("token", token.access_token, {
+    //   path: "/", // the cookie will be available for all routes in your app
+    //   httpOnly: true, // prevent cookie from being accessed by client-side APIs
+    //   secure: true, // cookie will only be sent over HTTPS
+    //   expires: new Date(Date.now() + 3600000), // cookie expires in 1 hour
+    // });
 
     // if later you need to refresh the token you can use
     // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
@@ -61,9 +61,12 @@ export default async (fastify) => {
       affiliation: "",
     };
 
-    if (!await checkUser(userInfo.email)) {
+    // check if user exists in database or not and create new user if not exists
+    const userCheck = await checkUser(userInfo.email);
+    if (!userCheck) {
       const newUser = await createUser(user);
       if (newUser) {
+        request.session.set("user", newUser.id);
         reply.send({
           success: true,
           message: "User created successfully",
@@ -75,11 +78,30 @@ export default async (fastify) => {
       }
     }
 
+    request.session.set("user", userCheck.id);
     reply.send({
       success: true,
       message: "User logged in successfully",
-      data: userInfo,
+      data: userCheck,
       new_user: false,
+    });
+  });
+
+  fastify.get("/User", async function (request, reply, done) {
+    const userId = request.session.get("user");
+    console.log(userId);
+    if (!userId) {
+      reply.send({
+        success: false,
+        message: "User not logged in",
+        data: null,
+      });
+    }
+
+    reply.send({
+      success: true,
+      message: "User logged in successfully",
+      data: userId,
     });
   });
 
@@ -98,46 +120,71 @@ export default async (fastify) => {
     callbackUri: process.env.CALLBACK_URI_FACEBOOK,
   });
 
-  fastify.get("/login/facebook/callback", async function (request, reply) {
-    const { token } =
-      await this.facebookOAuth2.getAccessTokenFromAuthorizationCodeFlow(
-        request
+  fastify.get(
+    "/login/facebook/callback",
+    async function (request, reply, done) {
+      const { token } =
+        await this.facebookOAuth2.getAccessTokenFromAuthorizationCodeFlow(
+          request
+        );
+
+      const { data } = await axios.get(
+        "https://graph.facebook.com/v18.0/me?fields=id,name,email,picture,birthday,friends,first_name,last_name",
+
+        {
+          headers: {
+            Authorization: `Bearer ${token.access_token}`,
+          },
+        }
       );
 
-    const userInfo = await axios.get(
-      "https://graph.facebook.com/v18.0/me?fields=id,name,email,picture.type(large),birthday,friends,first_name,last_name",
+      reply.send({
+        data: data,
+      });
+      done();
 
-      {
-        headers: {
-          Authorization: `Bearer ${token.access_token}`,
-        },
+      var userInfo = JSON.parse(JSON.stringify(data));
+
+      const user = {
+        first_name_th: userInfo.given_name,
+        last_name_th: userInfo.family_name,
+        first_name_en: userInfo.given_name,
+        last_name_en: userInfo.family_name,
+        email: userInfo.email,
+        profile_pic: userInfo.picture,
+        affiliation: "",
+      };
+
+      if (!(await checkUser(userInfo.email))) {
+        const newUser = await createUser(user);
+        if (newUser) {
+          reply.send({
+            success: true,
+            message: "User created successfully",
+            data: newUser,
+            new_user: true,
+          });
+        } else {
+          reply.send({ error: "Internal Server Error" });
+        }
       }
-    );
 
-    const profile_pic = await axios.get(
-      `https://graph.facebook.com/v18.0/${userInfo.data.id}/picture?redirect=false&access_token=${token.access_token}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token.access_token}`,
-        },
-      }
-    );
+      reply.setCookie("token", token.access_token, {
+        path: "/", // the cookie will be available for all routes in your app
+        httpOnly: true, // prevent cookie from being accessed by client-side APIs
+        secure: true, // cookie will only be sent over HTTPS
+        expires: new Date(Date.now() + 3600000), // cookie expires in 1 hour
+      });
 
-    reply.setCookie("token", token.access_token, {
-      path: "/", // the cookie will be available for all routes in your app
-      httpOnly: true, // prevent cookie from being accessed by client-side APIs
-      secure: true, // cookie will only be sent over HTTPS
-      expires: new Date(Date.now() + 3600000), // cookie expires in 1 hour
-    });
-
-    reply.send({
-      // access_token: token.access_token,
-      // token_type: token.token_type,
-      // expire: token.expires_in,
-      userInfo: userInfo.data,
-      profile_pic: profile_pic.data,
-    });
-  });
+      reply.send({
+        // access_token: token.access_token,
+        // token_type: token.token_type,
+        // expire: token.expires_in,
+        userInfo: userInfo.data,
+        profile_pic: profile_pic.data,
+      });
+    }
+  );
 
   fastify.get(
     "/user",
@@ -180,6 +227,53 @@ export default async (fastify) => {
   );
 
   fastify.get("/logout", async (request, reply) => {
-    reply.clearCookie("token").send({ message: "You are logged out" });
+    try {
+      request.session.delete();
+      reply.send({
+        success: true,
+        message: "User logged out successfully",
+        data: null,
+      });
+    } catch (error) {
+      reply.code(500).send({
+        success: false,
+        message: "Internal Server Error",
+        data: null,
+      });
+    }
+  });
+
+  fastify.get("/set-session", async (request, reply) => {
+    request.session.set("user", 2);
+    if (request.session.get("user")) {
+      reply.send({
+        success: true,
+        message: "User logged in successfully",
+        data: request.session.get("user"),
+      });
+    } else {
+      reply.send({
+        success: false,
+        message: "User not logged in",
+        data: null,
+      });
+    }
+  });
+
+  fastify.get("/get-session", async (request, reply) => {
+    const userId = request.session.get("user");
+    if (request.session.get("user")) {
+      reply.send({
+        success: true,
+        message: "User logged in successfully",
+        data: request.session.get("user"),
+      });
+    } else {
+      reply.send({
+        success: false,
+        message: "User not logged in",
+        data: null,
+      });
+    }
   });
 };

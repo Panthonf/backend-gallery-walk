@@ -1,26 +1,26 @@
 import pool from "../../db/db.js";
 
 async function getAllUsers() {
-  const query = 'SELECT * FROM public."User"';
+  const query = 'SELECT * FROM public."Users"';
   const result = await pool.query(query);
   return result.rows;
 }
 
 async function getUserById(userId) {
-  const query = 'SELECT * FROM public."User" WHERE id = $1';
+  const query = 'SELECT * FROM public."Users" WHERE id = $1';
   const result = await pool.query(query, [userId]);
   return result.rows[0];
 }
 
 async function checkUser(email) {
-  const query = 'SELECT * FROM public."User" WHERE email = $1';
+  const query = 'SELECT * FROM public."Users" WHERE email = $1';
   const result = await pool.query(query, [email]);
   return result.rows[0];
 }
 
 async function createUser(userData) {
   const query =
-    'INSERT INTO public."User" (first_name_th, last_name_th, first_name_en, last_name_en, email, affiliation, profile_pic) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
+    'INSERT INTO public."Users" (first_name_th, last_name_th, first_name_en, last_name_en, email, affiliation, profile_pic) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
   const result = await pool.query(query, [
     userData.first_name_th,
     userData.last_name_th,

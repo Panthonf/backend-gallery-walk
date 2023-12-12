@@ -59,7 +59,7 @@ async function createEventService(request, reply, done) {
   }
 }
 
-async function updateEventController(request, reply, done) {
+async function updateEventService(request, reply, done) {
   const eventId = parseInt(request.params.id);
   const updatedEventData = request.body;
   try {
@@ -83,7 +83,7 @@ async function updateEventController(request, reply, done) {
   }
 }
 
-async function deleteEventController(request, reply, done) {
+async function deleteEventService(request, reply, done) {
   const eventId = parseInt(request.params.id);
   try {
     const deletedEvent = await deleteEvent(eventId);
@@ -110,7 +110,7 @@ async function deleteEventController(request, reply, done) {
   }
 }
 
-async function getEventByUserIdController(request, reply, done) {
+async function getEventByUserIdService(request, reply, done) {
   const userId = parseInt(request.params.userId);
   try {
     const events = await getEventByUserId(userId);
@@ -128,7 +128,7 @@ async function getEventByUserIdController(request, reply, done) {
 export {
   getAllEventsService,
   createEventService,
-  updateEventController,
-  deleteEventController,
-  getEventByUserIdController,
+  updateEventService,
+  deleteEventService,
+  getEventByUserIdService,
 };

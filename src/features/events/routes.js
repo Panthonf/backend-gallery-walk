@@ -1,9 +1,9 @@
 import {
   getAllEventsService,
   createEventService,
-  updateEventController,
-  deleteEventController,
-  getEventByUserIdController,
+  updateEventService,
+  deleteEventService,
+  getEventByUserIdService,
 } from "./services.js";
 
 const schema = {
@@ -44,9 +44,9 @@ const schema = {
 };
 
 export default async (fastify) => {
-  fastify.get("/", getAllEventsService);
-  fastify.get("/user/:userId", getEventByUserIdController);
   fastify.post("/", { schema }, createEventService);
-  fastify.put("/:id", updateEventController);
-  fastify.delete("/:id", deleteEventController);
+  fastify.get("/", getAllEventsService);
+  fastify.get("/user/:userId", getEventByUserIdService);
+  fastify.put("/:id", updateEventService);
+  fastify.delete("/:id", deleteEventService);
 };

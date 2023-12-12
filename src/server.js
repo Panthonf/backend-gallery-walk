@@ -21,11 +21,7 @@ server.get(
   }
 );
 
-server.register(cors, {
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-});
+
 
 const start = async () => {
   try {

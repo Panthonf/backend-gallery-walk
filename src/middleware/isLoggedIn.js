@@ -1,7 +1,13 @@
-export default function isLoggedIn(request, reply, done) {
-  const { token } = request.cookies;
-  if (!token) {
-    reply.code(401).send({ error: "Unauthorized" });
+function isLoggedIn(request, reply, done) {
+  if (request.session.get("user")) {
+    done();
+  } else {
+    reply.status(401).send({
+      success: false,
+      message: "Unauthorized",
+      data: null,
+    });
   }
-  done();
 }
+
+export { isLoggedIn };

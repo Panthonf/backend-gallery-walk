@@ -1,19 +1,49 @@
 import Fastify from "fastify";
 import dotenv from "dotenv";
-import isLoggedIn from "./middleware/isLoggedIn.js";
+import { isLoggedIn } from "./middleware/isLoggedIn.js";
+import { checkSessionMiddleware } from "./middleware/checkSessionMiddleware.js";
 dotenv.config();
 const server = Fastify({ logger: true });
 
 server.register(import("@fastify/cookie"));
+
 server.decorate("isLoggedIn", isLoggedIn);
+server.decorate("checkSessionMiddleware", checkSessionMiddleware);
+
+server.register(import("@fastify/cors"), {
+  origin: "http://localhost:3001",
+  credentials: true,
+});
+
+server.register(import("@fastify/secure-session"), {
+  secret: process.env.SECRET_KEY,
+  cookie: {
+    path: "/",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Use true in production
+    sameSite: "lax", // Adjust sameSite based on your requirements
+  },
+  cookieName: "Set-Cookie",
+  saveUninitialized: false,
+  resave: false,
+});
 
 server.get(
   "/demo",
-  { preValidation: [server.isLoggedIn] },
-  async (req, reply) => {
-    reply.send({ message: "You are logged in" });
+  { preValidation: [server.checkSessionMiddleware] },
+  async (req, res) => {
+    const sessionData = req.session.get("user");
+    return {
+      sessionData,
+    };
   }
 );
+
+server.get("/ping", async (req, res) => {
+  return {
+    pong: "it works!",
+  };
+});
 
 await server.register(import("@fastify/swagger"));
 await server.register(import("@fastify/swagger-ui"), {

@@ -6,7 +6,7 @@ import {
   getUserByEmail,
 } from "./models.js";
 
-async function getAllUsersController(request, reply) {
+async function getAllUsersController(request, reply, done) {
   try {
     const users = await getAllUsers();
     if (users) {
@@ -87,8 +87,8 @@ async function deleteUserController(request, reply) {
 }
 
 async function getUserByIdController(request, reply) {
-  const userId = parseInt(request.params.id);
   try {
+    const userId = request.session.get("user");
     const user = await getUserById(userId);
     if (user) {
       reply.send(user);
