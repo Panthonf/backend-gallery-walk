@@ -54,15 +54,13 @@ export default async (fastify) => {
       if (newUser) {
         request.session.set("user", newUser.id);
         reply.redirect(process.env.FRONTEND_URL + "/dashboard");
-        done();
       } else {
         reply.redirect(process.env.FRONTEND_URL + "/login");
-        done();
       }
     }
 
     request.session.set("user", userCheck.id);
-    reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+    reply.redirect(process.env.FRONTEND_URL + "/dashboardss");
   });
 
   // Facebook login
