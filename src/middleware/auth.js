@@ -54,8 +54,10 @@ export default async (fastify) => {
       if (newUser) {
         request.session.set("user", newUser.id);
         reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+        done();
       } else {
         reply.redirect(process.env.FRONTEND_URL + "/login");
+        done();
       }
     }
 
@@ -240,7 +242,7 @@ export default async (fastify) => {
     if (user) {
       reply.send({ authenticated: true, user });
     } else {
-      reply.send({ authenticated: false });
+      reply.send({ authenticated: false, user: null });
     }
   });
 };
