@@ -4,6 +4,7 @@ import {
   updateEventService,
   deleteEventService,
   getEventByUserIdService,
+  uploadThumbnailService
 } from "./services.js";
 
 const schema = {
@@ -23,7 +24,7 @@ const schema = {
       // "published",
       // "organization",
       // "video_link",
-      "user_id",
+      // "user_id",
     ],
     properties: {
       event_name: { type: "string", minLength: 1, maxLength: 255 },
@@ -38,7 +39,7 @@ const schema = {
       published: { type: "boolean" },
       organization: { type: "string" },
       video_link: { type: "string" },
-      user_id: { type: "number" },
+      // user_id: { type: "number" },
     },
   },
 };
@@ -49,4 +50,5 @@ export default async (fastify) => {
   fastify.get("/user/:userId", getEventByUserIdService);
   fastify.put("/:id", updateEventService);
   fastify.delete("/:id", deleteEventService);
+  fastify.post("/upload-thumbnail", uploadThumbnailService);
 };
