@@ -17,17 +17,13 @@ export default async (fastify) => {
       },
       auth: oauthPlugin.GOOGLE_CONFIGURATION,
     },
-    // register a fastify url to start the redirect flow
     startRedirectPath: "/login/google",
-    // facebook redirect here after the user login
     callbackUri: CALLBACK_URI,
   });
 
   fastify.get("/login/google/callback", async function (request, reply, done) {
     const { token } =
       await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
-
-    console.log(token.access_token);
 
     const { data } = await axios.get(
       "https://www.googleapis.com/oauth2/v3/userinfo",
@@ -38,16 +34,6 @@ export default async (fastify) => {
         },
       }
     );
-
-    // reply.setCookie("token", token.access_token, {
-    //   path: "/", // the cookie will be available for all routes in your app
-    //   httpOnly: true, // prevent cookie from being accessed by client-side APIs
-    //   secure: true, // cookie will only be sent over HTTPS
-    //   expires: new Date(Date.now() + 3600000), // cookie expires in 1 hour
-    // });
-
-    // if later you need to refresh the token you can use
-    // const { token: newToken } = await this.getNewAccessTokenUsingRefreshToken(token)
 
     var userInfo = JSON.parse(JSON.stringify(data));
 
@@ -67,42 +53,14 @@ export default async (fastify) => {
       const newUser = await createUser(user);
       if (newUser) {
         request.session.set("user", newUser.id);
-        reply.send({
-          success: true,
-          message: "User created successfully",
-          data: newUser,
-          new_user: true,
-        });
+        reply.redirect(process.env.FRONTEND_URL + "/dashboard");
       } else {
-        reply.send({ error: "Internal Server Error" });
+        reply.redirect(process.env.FRONTEND_URL + "/login");
       }
     }
 
     request.session.set("user", userCheck.id);
-    reply.send({
-      success: true,
-      message: "User logged in successfully",
-      data: userCheck,
-      new_user: false,
-    });
-  });
-
-  fastify.get("/User", async function (request, reply, done) {
-    const userId = request.session.get("user");
-    console.log(userId);
-    if (!userId) {
-      reply.send({
-        success: false,
-        message: "User not logged in",
-        data: null,
-      });
-    }
-
-    reply.send({
-      success: true,
-      message: "User logged in successfully",
-      data: userId,
-    });
+    reply.redirect(process.env.FRONTEND_URL + "/dashboard");
   });
 
   // Facebook login
@@ -274,6 +232,15 @@ export default async (fastify) => {
         message: "User not logged in",
         data: null,
       });
+    }
+  });
+
+  fastify.get("/isLoggedIn", async (request, reply) => {
+    const user = request.session.get("user");
+    if (user) {
+      reply.send({ isLoggedIn: true, user });
+    } else {
+      reply.send({ isLoggedIn: false });
     }
   });
 };
