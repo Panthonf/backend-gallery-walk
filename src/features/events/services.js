@@ -1,3 +1,4 @@
+import minioClient from "../../middleware/minio.js";
 import {
   getAllEvents,
   createEvent,
@@ -32,9 +33,11 @@ async function getAllEventsService(request, reply) {
   }
 }
 
-async function createEventService(request, reply, done) {
+async function createEventService(req, reply, done) {
   try {
-    const eventData = request.body;
+    const userId = req.session.get("user");
+    const eventData = req.body;
+    eventData.user_id = userId;
     const event = await createEvent(eventData);
     if (event) {
       reply.status(201).send({
@@ -125,10 +128,37 @@ async function getEventByUserIdService(request, reply, done) {
   }
 }
 
+async function uploadThumbnailService(request, reply, done) {
+  const eventId = request.query.id;
+  const thumbnail = await request.file();
+  
+  // Access the filename
+  const thumbnailName = thumbnail.filename;
+
+  minioClient.putObject(
+    "event-bucket",
+    thumbnailName,
+    thumbnail.file,
+    function (err, etag) {
+      if (err) return console.log(err);
+      console.log("File uploaded successfully.");
+    }
+  );
+  reply.send({
+    success: true,
+    message: "Thumbnail uploaded successfully",
+    data: {
+      eventId: eventId,
+      thumbnailName,
+    },
+  });
+}
+
 export {
   getAllEventsService,
   createEventService,
   updateEventService,
   deleteEventService,
   getEventByUserIdService,
+  uploadThumbnailService,
 };
