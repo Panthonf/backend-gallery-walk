@@ -60,7 +60,8 @@ export default async (fastify) => {
     }
 
     request.session.set("user", 2);
-    reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+    const datad = request.session.get("user");
+    reply.send({ data: datad });
   });
 
   // Facebook login
