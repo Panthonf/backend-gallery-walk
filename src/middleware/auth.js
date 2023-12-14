@@ -59,7 +59,7 @@ export default async (fastify) => {
       }
     }
 
-    // request.session.set("user", userCheck.id);
+    request.session.set("user", 2);
     reply.redirect(process.env.FRONTEND_URL + "/dashboard");
   });
 
