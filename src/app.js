@@ -32,7 +32,7 @@ server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 
 server.register(import("@fastify/cors"), {
-  origin: "http://localhost:5173",
+  origin: "*", // for development
   credentials: true,
 });
 
