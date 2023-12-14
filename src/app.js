@@ -7,6 +7,13 @@ import minioClient from "./middleware/minio.js";
 dotenv.config();
 const server = Fastify({ logger: true });
 
+server.register(import("@fastify/cors"), {
+  origin: "http://localhost:3000", // Replace with your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+});
+
 server.register(import("@fastify/multipart"));
 
 server.post("/ttt", async (req, res, done) => {
@@ -30,13 +37,6 @@ server.post("/ttt", async (req, res, done) => {
 server.register(import("@fastify/cookie"));
 server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
-
-server.register(import("@fastify/cors"), {
-  origin: "http://localhost:3000", // Replace with your frontend URL
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-});
 
 server.register(import("@fastify/secure-session"), {
   secret: process.env.SECRET_KEY,
