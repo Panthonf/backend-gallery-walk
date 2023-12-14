@@ -50,6 +50,16 @@ const sql_create_events_table = `
   );
 `;
 
+const table_thumbnails = "Thumbnails";
+const sql_create_thumbnails_table = `
+  CREATE TABLE IF NOT EXISTS public."${table_thumbnails}" (
+    id serial PRIMARY KEY,
+    event_id INT NOT NULL,
+    thumbnail VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+  );`
+
 async function createTableIfNotExists(tableName, createTableQuery) {
   try {
     const result = await pool.query(
@@ -83,5 +93,6 @@ async function dropTable(tableName) {
 
 createTableIfNotExists(table_users, sql_create_users_table);
 createTableIfNotExists(table_events, sql_create_events_table);
+createTableIfNotExists(table_thumbnails, sql_create_thumbnails_table);
 
 export default pool;
