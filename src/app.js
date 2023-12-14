@@ -2,11 +2,32 @@ import Fastify from "fastify";
 import dotenv from "dotenv";
 import { isLoggedIn } from "./middleware/isLoggedIn.js";
 import { checkSessionMiddleware } from "./middleware/checkSessionMiddleware.js";
+import minioClient from "./middleware/minio.js";
+
 dotenv.config();
 const server = Fastify({ logger: true });
 
-server.register(import("@fastify/cookie"));
+server.register(import("@fastify/multipart"));
 
+server.post("/ttt", async (req, res, done) => {
+  const data = await req.file();
+  const image = {
+    name: data.filename,
+    data: data.file,
+  };
+  const save = await minioClient.putObject(
+    "project-bucket",
+    image.name,
+    image.data,
+    function (err, etag) {
+      if (err) return console.log(err);
+      console.log("File uploaded successfully.");
+    }
+  );
+  res.send(save);
+});
+
+server.register(import("@fastify/cookie"));
 server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 
@@ -38,12 +59,6 @@ server.get(
     };
   }
 );
-
-server.get("/ping", async (req, res) => {
-  return {
-    pong: "it works!",
-  };
-});
 
 await server.register(import("@fastify/swagger"));
 await server.register(import("@fastify/swagger-ui"), {
