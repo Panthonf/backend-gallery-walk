@@ -4,7 +4,8 @@ import {
   updateEventService,
   deleteEventService,
   getEventByUserIdService,
-  uploadThumbnailService
+  uploadThumbnailService,
+  getThumbnail
 } from "./services.js";
 
 const schema = {
@@ -51,4 +52,5 @@ export default async (fastify) => {
   fastify.put("/:id", updateEventService);
   fastify.delete("/:id", deleteEventService);
   fastify.post("/upload-thumbnail", uploadThumbnailService);
+  fastify.get("/thumbnail", getThumbnail);
 };
