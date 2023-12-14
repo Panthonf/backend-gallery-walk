@@ -22,45 +22,61 @@ export default async (fastify) => {
   });
 
   fastify.get("/login/google/callback", async function (request, reply, done) {
-    const { token } =
-      await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
+    fastify.get(
+      "/login/google/callback",
+      async function (request, reply, done) {
+        try {
+          const { token } =
+            await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(
+              request
+            );
 
-    const { data } = await axios.get(
-      "https://www.googleapis.com/oauth2/v3/userinfo",
+          const { data } = await axios.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            {
+              headers: {
+                Authorization: `Bearer ${token.access_token}`,
+              },
+            }
+          );
 
-      {
-        headers: {
-          Authorization: `Bearer ${token.access_token}`,
-        },
+          var userInfo = JSON.parse(JSON.stringify(data));
+
+          const user = {
+            first_name_th: userInfo.given_name,
+            last_name_th: userInfo.family_name,
+            first_name_en: userInfo.given_name,
+            last_name_en: userInfo.family_name,
+            email: userInfo.email,
+            profile_pic: userInfo.picture,
+            affiliation: "",
+          };
+
+          // Check if user exists in the database or not and create a new user if not exists
+          const userCheck = await checkUser(userInfo.email);
+
+          if (!userCheck) {
+            const newUser = await createUser(user);
+
+            if (newUser) {
+              request.session.set("user", newUser.id);
+              reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+              return; // Add return to prevent further execution
+            } else {
+              reply.redirect(process.env.FRONTEND_URL + "/login");
+              return; // Add return to prevent further execution
+            }
+          }
+
+          // User exists in the database
+          request.session.set("user", userCheck.id);
+          reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+        } catch (error) {
+          console.error("Error in Google OAuth callback:", error);
+          reply.redirect(process.env.FRONTEND_URL + "/login");
+        }
       }
     );
-
-    var userInfo = JSON.parse(JSON.stringify(data));
-
-    const user = {
-      first_name_th: userInfo.given_name,
-      last_name_th: userInfo.family_name,
-      first_name_en: userInfo.given_name,
-      last_name_en: userInfo.family_name,
-      email: userInfo.email,
-      profile_pic: userInfo.picture,
-      affiliation: "",
-    };
-
-    // check if user exists in database or not and create new user if not exists
-    const userCheck = await checkUser(userInfo.email);
-    if (!userCheck) {
-      const newUser = await createUser(user);
-      if (newUser) {
-        request.session.set("user", newUser.id);
-        reply.redirect(process.env.FRONTEND_URL + "/dashboard");
-      } else {
-        reply.redirect(process.env.FRONTEND_URL + "/login");
-      }
-    }
-
-    request.session.set("user", userCheck.id);
-    reply.redirect(process.env.FRONTEND_URL + "/dashboardss");
   });
 
   // Facebook login
