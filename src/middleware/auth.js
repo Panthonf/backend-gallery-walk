@@ -60,7 +60,11 @@ export default async (fastify) => {
     }
 
     request.session.set("user", userCheck.id);
-    reply.redirect(process.env.FRONTEND_URL + "/login");
+    if (request.session.get("user")) {
+      reply.redirect(process.env.FRONTEND_URL + "/");
+    } else {
+      reply.redirect(process.env.FRONTEND_URL + "/login");
+    }
   });
 
   // Facebook login
