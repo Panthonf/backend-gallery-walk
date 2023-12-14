@@ -53,14 +53,14 @@ export default async (fastify) => {
       const newUser = await createUser(user);
       if (newUser) {
         request.session.set("user", newUser.id);
-        reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+        reply.redirect(process.env.FRONTEND_URL + "/login");
       } else {
         reply.redirect(process.env.FRONTEND_URL + "/login");
       }
     }
 
     request.session.set("user", userCheck.id);
-    reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+    reply.redirect(process.env.FRONTEND_URL + "/login");
   });
 
   // Facebook login
