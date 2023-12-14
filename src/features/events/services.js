@@ -131,19 +131,25 @@ async function getEventByUserIdService(request, reply, done) {
 async function uploadThumbnailService(request, reply, done) {
   const eventId = request.query.id;
   const thumbnail = await request.file();
-  
+
   // Access the filename
   const thumbnailName = thumbnail.filename;
 
-  minioClient.putObject(
-    "event-bucket",
-    thumbnailName,
-    thumbnail.file,
-    function (err, etag) {
-      if (err) return console.log(err);
+  await minioClient
+    .putObject("event-bucket", thumbnailName, thumbnail.file)
+    .then((res) => {
       console.log("File uploaded successfully.");
-    }
-  );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  reply.send({
+    imageUrl: `${process.env.MINIO_ENDPOINT}/event-bucket/${thumbnailName}`,
+    eventId: eventId,
+  });
+
+  done();
   reply.send({
     success: true,
     message: "Thumbnail uploaded successfully",
@@ -154,6 +160,20 @@ async function uploadThumbnailService(request, reply, done) {
   });
 }
 
+async function getThumbnail(request, reply, done) {
+  const eventId = request.params.id;
+  const thumbnailName = "PLoS_oral_cancer.png";
+
+  const url = await minioClient.presignedGetObject(
+    "event-bucket",
+    thumbnailName
+  );
+
+  reply.header('Content-Type', 'image/png');
+
+  reply.redirect(301, url);
+}
+
 export {
   getAllEventsService,
   createEventService,
@@ -161,4 +181,5 @@ export {
   deleteEventService,
   getEventByUserIdService,
   uploadThumbnailService,
+  getThumbnail,
 };
