@@ -32,7 +32,9 @@ server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 
 server.register(import("@fastify/cors"), {
-  origin: "*", // for development
+  origin: process.env.FRONTEND_URL, // Replace with your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 });
 
