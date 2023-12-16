@@ -4,6 +4,7 @@ import {
   deleteEventService,
   getEventByUserIdService,
   uploadThumbnailService,
+  getAllEventsService
 } from "./services.js";
 
 const schema = {
@@ -47,10 +48,12 @@ export default async (fastify) => {
   );
 
   fastify.get(
-    "/user",
+    "/by-user",
     { preValidation: [fastify.checkSessionMiddleware] },
     getEventByUserIdService
   );
+
+  fastify.get("/", getAllEventsService);
 
   fastify.put("/:id", updateEventService);
   fastify.delete("/:id", deleteEventService);
