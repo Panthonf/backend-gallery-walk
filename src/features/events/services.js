@@ -164,14 +164,32 @@ async function getThumbnail(request, reply, done) {
   const eventId = request.params.id;
   const thumbnailName = "PLoS_oral_cancer.png";
 
-  const url = await minioClient.presignedGetObject(
-    "event-bucket",
-    thumbnailName
-  );
+  try {
+    const stream = await minioClient.getObject("event-bucket", thumbnailName);
+    reply.send({
+      success: true,
+      message: "Thumbnail fetched successfully",
+      data: stream,
+    });
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({ error: "Internal Server Error" });
+  }
+}
 
-  reply.header('Content-Type', 'image/png');
-
-  reply.redirect(301, url);
+async function getAllUserEvents(req, reply, done){
+  const userId = req.session.get("user");
+  try {
+    const events = await getEventByUserId(userId);
+    reply.send(events);
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
 }
 
 export {
@@ -182,4 +200,5 @@ export {
   getEventByUserIdService,
   uploadThumbnailService,
   getThumbnail,
+  getAllUserEvents
 };

@@ -1,5 +1,4 @@
 import server from "./app.js";
-import cors from "@fastify/cors";
 
 const PORT = process.env.PORT || 3000;
 
@@ -8,20 +7,6 @@ server.get("/", async (req, res) => {
     Welcome: "Welcome to the Fastify API",
   };
 });
-
-server.get(
-  "/test",
-  {
-    preValidation: [server.isLoggedIn],
-  },
-  async (req, res) => {
-    return {
-      test: "test",
-    };
-  }
-);
-
-
 
 const start = async () => {
   try {

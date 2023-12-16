@@ -3,7 +3,7 @@ import axios from "axios";
 import { checkUser, createUser } from "../features/users/models.js";
 
 const CALLBACK_URI =
-  process.env.CALLBACK_URI || "http://localhost:3000/login/google/callback";
+  process.env.CALLBACK_URI || "http://localhost:8080/login/google/callback";
 
 export default async (fastify) => {
   // Google login
@@ -53,7 +53,7 @@ export default async (fastify) => {
       const newUser = await createUser(user);
       if (newUser) {
         request.session.set("user", newUser.id);
-        reply.redirect(process.env.FRONTEND_URL + "/login");
+        reply.redirect(process.env.FRONTEND_URL + "/dashboard");
       } else {
         reply.redirect(process.env.FRONTEND_URL + "/login");
       }
@@ -61,7 +61,7 @@ export default async (fastify) => {
 
     request.session.set("user", userCheck.id);
     if (request.session.get("user")) {
-      reply.redirect(process.env.FRONTEND_URL + "/");
+      reply.redirect(process.env.FRONTEND_URL + "/dashboard");
     } else {
       reply.redirect(process.env.FRONTEND_URL + "/login");
     }

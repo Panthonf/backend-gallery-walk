@@ -3,6 +3,7 @@ import {
   createUserController,
   deleteUserController,
   getUserByIdController,
+  getUserByEmailService
 } from "./services.js";
 
 export default async (fastify) => {
@@ -16,4 +17,6 @@ export default async (fastify) => {
       test: "test",
     };
   });
+
+  fastify.get("/:email", getUserByEmailService)
 };

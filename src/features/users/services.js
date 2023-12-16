@@ -109,9 +109,33 @@ async function getUserByIdController(request, reply) {
   }
 }
 
+async function getUserByEmailService(request, reply) {
+  const email = request.params.email;
+  try {
+    const user = await getUserByEmail(email);
+    if (user) {
+      reply.send(user);
+    } else {
+      reply.status(404).send({
+        success: false,
+        message: "User not found",
+        data: null,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      data: null,
+    });
+  }
+}
+
 export {
   getAllUsersController,
   createUserController,
   deleteUserController,
   getUserByIdController,
+  getUserByEmailService
 };

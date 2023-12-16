@@ -8,7 +8,7 @@ dotenv.config();
 const server = Fastify({ logger: true });
 
 server.register(import("@fastify/cors"), {
-  origin: "http://localhost:3000", // Replace with your frontend URL
+  origin: "http://localhost:5173", // Replace with your frontend URL
   // methods: ["GET", "POST", "PUT", "DELETE"],
   // allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
