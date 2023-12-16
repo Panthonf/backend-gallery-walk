@@ -5,6 +5,7 @@ import {
   updateEvent,
   deleteEvent,
   getEventByUserId,
+  uploadThumbnail,
 } from "./models.js";
 
 async function getAllEventsService(request, reply) {
@@ -36,15 +37,28 @@ async function getAllEventsService(request, reply) {
 async function createEventService(req, reply, done) {
   try {
     const userId = req.session.get("user");
-    const eventData = req.body;
-    eventData.user_id = userId;
+    const eventData = {
+      ...req.body,
+      user_id: userId,
+    };
+
     const event = await createEvent(eventData);
+
     if (event) {
-      reply.status(201).send({
-        success: true,
-        message: "Event created successfully",
-        data: event,
-      });
+      try {
+        reply.status(201).send({
+          success: true,
+          message: "Submited event successfully",
+          data: event,
+        });
+      } catch (uploadError) {
+        console.error("Error uploading file:", uploadError);
+        reply.status(500).send({
+          success: false,
+          message: "Error uploading file",
+          data: null,
+        });
+      }
     } else {
       reply.status(500).send({
         success: false,
@@ -53,7 +67,7 @@ async function createEventService(req, reply, done) {
       });
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error processing request:", error);
     reply.status(500).send({
       success: false,
       message: error.message,
@@ -114,10 +128,22 @@ async function deleteEventService(request, reply, done) {
 }
 
 async function getEventByUserIdService(request, reply, done) {
-  const userId = parseInt(request.params.userId);
+  const userId = request.session.get("user");
   try {
     const events = await getEventByUserId(userId);
-    reply.send(events);
+    if (events.length === 0) {
+      reply.status(404).send({
+        success: false,
+        message: "Data not found",
+        data: null,
+      });
+    } else {
+      reply.send({
+        success: true,
+        message: "Events fetched successfully",
+        data: events,
+      });
+    }
   } catch (error) {
     console.error(error);
     reply.status(500).send({
@@ -129,61 +155,49 @@ async function getEventByUserIdService(request, reply, done) {
 }
 
 async function uploadThumbnailService(request, reply, done) {
-  const eventId = request.query.id;
+  const eventId = parseInt(request.params.id);
   const thumbnail = await request.file();
+  const thumbnailName = `${eventId}-${thumbnail.filename}`;
 
-  // Access the filename
-  const thumbnailName = thumbnail.filename;
-
-  await minioClient
-    .putObject("event-bucket", thumbnailName, thumbnail.file)
-    .then((res) => {
-      console.log("File uploaded successfully.");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-  reply.send({
-    imageUrl: `${process.env.MINIO_ENDPOINT}/event-bucket/${thumbnailName}`,
-    eventId: eventId,
-  });
-
-  done();
-  reply.send({
-    success: true,
-    message: "Thumbnail uploaded successfully",
-    data: {
-      eventId: eventId,
+  try {
+    const upload = minioClient.putObject(
+      "event-bucket",
       thumbnailName,
-    },
-  });
-}
+      thumbnail.file,
+      function (err, etag) {
+        if (err) {
+          console.log(err);
+          return reply.status(500).send({
+            success: false,
+            message: "Error uploading file",
+            data: null,
+          });
+        }
+        console.log("File uploaded successfully.");
+      }
+    );
 
-async function getThumbnail(request, reply, done) {
-  const eventId = request.params.id;
-  const thumbnailName = "PLoS_oral_cancer.png";
+    const thumbnailData = {
+      event_id: eventId,
+      thumbnail: thumbnailName,
+      thumbnail_url: `${process.env.MINIO_ENDPOINT}/event-bucket/${thumbnailName}`,
+    };
 
-  try {
-    const stream = await minioClient.getObject("event-bucket", thumbnailName);
-    reply.send({
-      success: true,
-      message: "Thumbnail fetched successfully",
-      data: stream,
-    });
+    const thumbnailUploaded = await uploadThumbnail(thumbnailData);
+    if (thumbnailUploaded) {
+      reply.send({
+        success: true,
+        message: "Thumbnail uploaded successfully",
+        data: thumbnailUploaded,
+      });
+    } else {
+      reply.status(500).send({
+        success: false,
+        message: "Internal Server Error",
+        data: null,
+      });
+    }
   } catch (error) {
-    console.error(error);
-    reply.status(500).send({ error: "Internal Server Error" });
-  }
-}
-
-async function getAllUserEvents(req, reply, done){
-  const userId = req.session.get("user");
-  try {
-    const events = await getEventByUserId(userId);
-    reply.send(events);
-  } catch (error) {
-    console.error(error);
     reply.status(500).send({
       success: false,
       message: error.message,
@@ -199,6 +213,4 @@ export {
   deleteEventService,
   getEventByUserIdService,
   uploadThumbnailService,
-  getThumbnail,
-  getAllUserEvents
 };
