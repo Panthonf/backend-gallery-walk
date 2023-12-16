@@ -6,6 +6,7 @@ import {
   deleteEvent,
   getEventByUserId,
   uploadThumbnail,
+  getThumbnailByEventId
 } from "./models.js";
 
 async function getAllEventsService(request, reply) {
@@ -206,6 +207,33 @@ async function uploadThumbnailService(request, reply, done) {
   }
 }
 
+async function getThumbnailByEventIdService(request, reply, done) {
+  const eventId = parseInt(request.params.eventId);
+  try {
+    const thumbnail = await getThumbnailByEventId(eventId);
+    if (thumbnail.length === 0) {
+      reply.status(404).send({
+        success: false,
+        message: "Data not found",
+        data: null,
+      });
+    } else {
+      reply.send({
+        success: true,
+        message: "Thumbnail fetched successfully",
+        data: thumbnail,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+}
+
 export {
   getAllEventsService,
   createEventService,
@@ -213,4 +241,5 @@ export {
   deleteEventService,
   getEventByUserIdService,
   uploadThumbnailService,
+  getThumbnailByEventIdService,
 };

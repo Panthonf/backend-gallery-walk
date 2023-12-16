@@ -86,6 +86,15 @@ async function uploadThumbnail(thumbnailData) {
   return thumbnail;
 }
 
+async function getThumbnailByEventId(eventId) {
+  const thumbnail = await prisma.thumbnails.findMany({
+    where: {
+      event_id: eventId,
+    },
+  });
+  return thumbnail;
+}
+
 export {
   getAllEvents,
   createEvent,
@@ -93,4 +102,5 @@ export {
   deleteEvent,
   getEventByUserId,
   uploadThumbnail,
+  getThumbnailByEventId
 };
