@@ -30,6 +30,7 @@ model Thumbnails {
   id         Int       @id @default(autoincrement())
   event_id   Int
   thumbnail  String    @db.VarChar(255)
+  thumbnail_url String? @db.VarChar(255)
   created_at DateTime? @default(now()) @db.Timestamp(6)
   updated_at DateTime? @db.Timestamp(6)
 }
