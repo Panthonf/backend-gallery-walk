@@ -73,10 +73,24 @@ async function getEventByUserId(userId) {
   return events;
 }
 
+async function uploadThumbnail(thumbnailData) {
+  const thumbnail = await prisma.thumbnails.create({
+    data: {
+      event_id: thumbnailData.event_id,
+      thumbnail: thumbnailData.thumbnail,
+      thumbnail_url: thumbnailData.thumbnail_url,
+      created_at: thumbnailData.created_at,
+      updated_at: thumbnailData.updated_at,
+    },
+  });
+  return thumbnail;
+}
+
 export {
   getAllEvents,
   createEvent,
   updateEvent,
   deleteEvent,
   getEventByUserId,
+  uploadThumbnail,
 };
