@@ -89,6 +89,7 @@ await server.register(import("@fastify/swagger-ui"), {
 // Include your routes
 server.register(import("./features/users/routes.js"), { prefix: "/users" });
 server.register(import("./features/events/routes.js"), { prefix: "/events" });
+server.register(import("./features/projects/routes.js"), {prefix: "/projects"});
 // fastify.register(require('./routes/productRoutes'));
 
 server.register(import("./middleware/auth.js"));
