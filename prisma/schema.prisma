@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Events {
+model events {
   id               Int       @id @default(autoincrement())
   event_name       String?   @db.VarChar(255)
   start_date       DateTime? @db.Timestamp(6)
@@ -26,16 +26,16 @@ model Events {
   updated_at       DateTime? @db.Timestamp(6)
 }
 
-model Thumbnails {
-  id         Int       @id @default(autoincrement())
-  event_id   Int
-  thumbnail  String    @db.VarChar(255)
-  thumbnail_url String? @db.VarChar(255)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  updated_at DateTime? @db.Timestamp(6)
+model thumbnails {
+  id            Int       @id @default(autoincrement())
+  event_id      Int
+  thumbnail     String    @db.VarChar(255)
+  thumbnail_url String?   @db.VarChar(255)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @db.Timestamp(6)
 }
 
-model Users {
+model users {
   id            Int     @id @default(autoincrement())
   first_name_th String? @db.VarChar(255)
   last_name_th  String? @db.VarChar(255)
@@ -44,4 +44,23 @@ model Users {
   email         String? @unique @db.VarChar(255)
   affiliation   String? @db.VarChar(255)
   profile_pic   String? @db.VarChar(255)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @db.Timestamp(6)
+}
+
+model projects {
+  id          Int     @id @default(autoincrement())
+  title       String? @db.VarChar(255)
+  description String? @db.Text
+  user_id     Int
+  event_id    Int
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @db.Timestamp(6)
+}
+
+model project_members {
+  id    Int    @id @default(autoincrement())
+  name  String @db.VarChar(255)
+  email String @db.VarChar(255)
+  project_id Int
 }
