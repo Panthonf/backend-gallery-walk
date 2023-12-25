@@ -22,6 +22,7 @@ async function checkUser(email) {
       email: email,
     },
   });
+  return user;
 }
 
 async function createUser(userData) {
