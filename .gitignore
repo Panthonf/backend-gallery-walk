@@ -142,3 +142,7 @@ Dockerfile
 .vscode
 
 data
+
+.tap
+
+__test__
