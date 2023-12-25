@@ -152,6 +152,9 @@ async function searchEvent(searchData, userId) {
       ],
       user_id: userId,
     },
+    orderBy: {
+      created_at: "desc",
+    },
   });
   return events;
 }
