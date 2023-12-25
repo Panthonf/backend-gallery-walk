@@ -6,7 +6,9 @@ import {
   deleteEvent,
   getEventByUserId,
   uploadThumbnail,
-  getThumbnailByEventId
+  getThumbnailByEventId,
+  getEventByEventId,
+  updateEventPublish,
 } from "./models.js";
 
 async function getAllEventsService(request, reply) {
@@ -49,7 +51,7 @@ async function createEventService(req, reply, done) {
       try {
         reply.status(201).send({
           success: true,
-          message: "Submited event successfully",
+          message: "Event created successfully",
           data: event,
         });
       } catch (uploadError) {
@@ -234,6 +236,52 @@ async function getThumbnailByEventIdService(request, reply, done) {
   }
 }
 
+async function getEventByEventIdService(request, reply, done) {
+  const eventId = parseInt(request.params.id);
+  try {
+    const event = await getEventByEventId(eventId);
+    if (event.length === 0) {
+      reply.status(404).send({
+        success: false,
+        message: "Data not found",
+        data: null,
+      });
+    } else {
+      reply.send({
+        success: true,
+        message: "Event fetched successfully",
+        data: event,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+}
+
+async function updateEventPublishedService(request, reply, done) {
+  const eventId = parseInt(request.params.id);
+
+  const publishedEvent = await updateEventPublish(eventId);
+  if (publishedEvent) {
+    reply.send({
+      success: true,
+      message: `Event "${publishedEvent.event_name}" published successfully`,
+      data: publishedEvent,
+    });
+  } else {
+    reply.status(404).send({
+      success: false,
+      message: `Event with id ${eventId} not found`,
+      data: null,
+    });
+  }
+}
+
 export {
   getAllEventsService,
   createEventService,
@@ -242,4 +290,6 @@ export {
   getEventByUserIdService,
   uploadThumbnailService,
   getThumbnailByEventIdService,
+  getEventByEventIdService,
+  updateEventPublishedService,
 };
