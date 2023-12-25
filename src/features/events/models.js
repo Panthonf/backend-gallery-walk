@@ -67,6 +67,9 @@ async function getEventByUserId(userId) {
     where: {
       user_id: userId,
     },
+    orderBy: {
+      created_at: "desc",
+    },
   });
   return events;
 }
@@ -93,6 +96,37 @@ async function getThumbnailByEventId(eventId) {
   return thumbnail;
 }
 
+async function getEventByEventId(eventId) {
+  const event = await prisma.events.findUnique({
+    where: {
+      id: eventId,
+    },
+  });
+  return event;
+}
+
+async function updateEventPublish(eventId) {
+  const isPublish = await prisma.events.findUnique({
+    where: {
+      id: eventId,
+    },
+    select: {
+      published: true,
+    },
+  });
+
+  const event = await prisma.events.update({
+    where: {
+      id: eventId,
+    },
+    data: {
+      published: !isPublish.published,
+    },
+  });
+
+  return event;
+}
+
 export {
   getAllEvents,
   createEvent,
@@ -100,5 +134,7 @@ export {
   deleteEvent,
   getEventByUserId,
   uploadThumbnail,
-  getThumbnailByEventId
+  getThumbnailByEventId,
+  getEventByEventId,
+  updateEventPublish,
 };
