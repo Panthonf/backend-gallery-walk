@@ -6,6 +6,8 @@ import {
   uploadThumbnailService,
   getAllEventsService,
   getThumbnailByEventIdService,
+  getEventByEventIdService,
+  updateEventPublishedService,
 } from "./services.js";
 
 const schema = {
@@ -56,9 +58,13 @@ export default async (fastify) => {
 
   fastify.get("/", getAllEventsService);
 
+  fastify.get("/:id", getEventByEventIdService);
+
   fastify.put("/:id", updateEventService);
   fastify.delete("/:id", deleteEventService);
   fastify.post("/upload/thumbnail/:id", uploadThumbnailService);
 
   fastify.get("/thumbnail/:eventId", getThumbnailByEventIdService);
+
+  fastify.put("/:id/publish", updateEventPublishedService);
 };
