@@ -8,6 +8,7 @@ import {
   getThumbnailByEventIdService,
   getEventByEventIdService,
   updateEventPublishedService,
+  searchEventService,
 } from "./services.js";
 
 const schema = {
@@ -67,4 +68,10 @@ export default async (fastify) => {
   fastify.get("/thumbnail/:eventId", getThumbnailByEventIdService);
 
   fastify.put("/:id/publish", updateEventPublishedService);
+
+  fastify.get(
+    "/search",
+    { preValidation: [fastify.checkSessionMiddleware] },
+    searchEventService
+  );
 };

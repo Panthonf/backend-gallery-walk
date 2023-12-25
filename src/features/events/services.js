@@ -9,6 +9,7 @@ import {
   getThumbnailByEventId,
   getEventByEventId,
   updateEventPublish,
+  searchEvent,
 } from "./models.js";
 
 async function getAllEventsService(request, reply) {
@@ -282,6 +283,31 @@ async function updateEventPublishedService(request, reply, done) {
   }
 }
 
+async function searchEventService(request, reply, done) {
+  const { query, page, pageSize } = request.query;
+  const userId = request.session.get("user");
+  const events = await searchEvent(query, userId);
+
+  const start = (page - 1) * pageSize;
+  const end = page * pageSize;
+
+  const paginatedEvents = events.slice(start, end);
+
+  if (paginatedEvents.length === 0) {
+    reply.status(404).send({
+      success: false,
+      message: "Data not found",
+      data: null,
+    });
+  } else {
+    reply.send({
+      success: true,
+      message: "Events fetched successfully",
+      data: paginatedEvents,
+    });
+  }
+}
+
 export {
   getAllEventsService,
   createEventService,
@@ -292,4 +318,5 @@ export {
   getThumbnailByEventIdService,
   getEventByEventIdService,
   updateEventPublishedService,
+  searchEventService,
 };

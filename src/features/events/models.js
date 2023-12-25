@@ -127,6 +127,35 @@ async function updateEventPublish(eventId) {
   return event;
 }
 
+async function searchEvent(searchData, userId) {
+  const events = await prisma.events.findMany({
+    where: {
+      OR: [
+        {
+          event_name: {
+            contains: searchData,
+            mode: "insensitive",
+          },
+        },
+        {
+          description: {
+            contains: searchData,
+            mode: "insensitive",
+          },
+        },
+        {
+          organization: {
+            contains: searchData,
+            mode: "insensitive",
+          },
+        },
+      ],
+      user_id: userId,
+    },
+  });
+  return events;
+}
+
 export {
   getAllEvents,
   createEvent,
@@ -137,4 +166,5 @@ export {
   getThumbnailByEventId,
   getEventByEventId,
   updateEventPublish,
+  searchEvent,
 };
