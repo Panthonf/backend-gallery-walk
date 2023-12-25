@@ -284,26 +284,39 @@ async function updateEventPublishedService(request, reply, done) {
 }
 
 async function searchEventService(request, reply, done) {
-  const { query, page, pageSize } = request.query;
-  const userId = request.session.get("user");
-  const events = await searchEvent(query, userId);
+  try {
+    const { query, page, pageSize } = request.query;
+    const userId = request.session.get("user");
 
-  const start = (page - 1) * pageSize;
-  const end = page * pageSize;
+    // Fetch all events based on the search query
+    const allEvents = await searchEvent(query, userId);
 
-  const paginatedEvents = events.slice(start, end);
+    // Calculate start and end based on the entire dataset
+    const start = (page - 1) * pageSize;
+    const end = page * pageSize;
 
-  if (paginatedEvents.length === 0) {
-    reply.status(404).send({
+    // Get the paginated subset from the entire dataset
+    const paginatedEvents = allEvents.slice(start, end);
+
+    if (paginatedEvents.length === 0) {
+      reply.status(404).send({
+        success: false,
+        message: "Data not found",
+        data: null,
+      });
+    } else {
+      reply.send({
+        success: true,
+        message: "Events fetched successfully",
+        data: paginatedEvents,
+      });
+    }
+  } catch (error) {
+    console.error("Error in searchEventService:", error);
+    reply.status(500).send({
       success: false,
-      message: "Data not found",
+      message: "Internal Server Error",
       data: null,
-    });
-  } else {
-    reply.send({
-      success: true,
-      message: "Events fetched successfully",
-      data: paginatedEvents,
     });
   }
 }
