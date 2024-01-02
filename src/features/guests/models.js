@@ -15,8 +15,4 @@ async function getAllEvents() {
   return events;
 }
 
-
-export {
-    getEventByEventId,
-    getAllEvents
-}
+export { getEventByEventId, getAllEvents };

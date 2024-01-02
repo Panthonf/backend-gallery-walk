@@ -5,6 +5,7 @@ import {
   guestLogout,
   setSession,
   getEventByEventIdService,
+  isLoggedInService,
 } from "./services.js";
 
 import { getAllEvents } from "./models.js";
@@ -23,24 +24,5 @@ export default async (fastify) => {
     getEventByEventIdService
   );
 
-  fastify.get(
-    "/events",
-    { preValidation: [fastify.isGuestLoggedIn] },
-    async (request, reply) => {
-      const events = await getAllEvents();
-      if (events.length === 0) {
-        reply.status(404).send({
-          success: false,
-          message: "Data not found",
-          data: null,
-        });
-      } else {
-        reply.send({
-          success: true,
-          message: "Events fetched successfully",
-          data: events,
-        });
-      }
-    }
-  );
+  fastify.get("/isLoggedIn", isLoggedInService);
 };

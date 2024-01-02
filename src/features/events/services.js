@@ -1,42 +1,15 @@
 import minioClient from "../../middleware/minio.js";
 import {
-  getAllEvents,
   createEvent,
   updateEvent,
   deleteEvent,
-  getEventByUserId,
   uploadThumbnail,
   getThumbnailByEventId,
   getEventByEventId,
   updateEventPublish,
   searchEvent,
+  getEventManagerInfo,
 } from "./models.js";
-
-async function getAllEventsService(request, reply) {
-  try {
-    const events = await getAllEvents();
-    if (events.length === 0) {
-      reply.status(404).send({
-        success: false,
-        message: "Data not found",
-        data: null,
-      });
-    } else {
-      reply.send({
-        success: true,
-        message: "Events fetched successfully",
-        data: events,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    reply.status(500).send({
-      success: false,
-      message: error.message,
-      data: null,
-    });
-  }
-}
 
 async function createEventService(req, reply, done) {
   try {
@@ -81,7 +54,7 @@ async function createEventService(req, reply, done) {
 }
 
 async function updateEventService(request, reply, done) {
-  const eventId = parseInt(request.params.id);
+  const eventId = parseInt(request.params.eventId);
   const updatedEventData = request.body;
   try {
     const event = await updateEvent(eventId, updatedEventData);
@@ -105,7 +78,7 @@ async function updateEventService(request, reply, done) {
 }
 
 async function deleteEventService(request, reply, done) {
-  const eventId = parseInt(request.params.id);
+  const eventId = parseInt(request.params.eventId);
   try {
     const deletedEvent = await deleteEvent(eventId);
     if (deletedEvent) {
@@ -131,35 +104,8 @@ async function deleteEventService(request, reply, done) {
   }
 }
 
-async function getEventByUserIdService(request, reply, done) {
-  const userId = request.session.get("user");
-  try {
-    const events = await getEventByUserId(userId);
-    if (events.length === 0) {
-      reply.status(404).send({
-        success: false,
-        message: "Data not found",
-        data: null,
-      });
-    } else {
-      reply.send({
-        success: true,
-        message: "Events fetched successfully",
-        data: events,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    reply.status(500).send({
-      success: false,
-      message: error.message,
-      data: null,
-    });
-  }
-}
-
 async function uploadThumbnailService(request, reply, done) {
-  const eventId = parseInt(request.params.id);
+  const eventId = parseInt(request.params.eventId);
   const thumbnail = await request.file();
   const thumbnailName = `${eventId}-${thumbnail.filename}`;
 
@@ -238,13 +184,13 @@ async function getThumbnailByEventIdService(request, reply, done) {
 }
 
 async function getEventByEventIdService(request, reply, done) {
-  const eventId = parseInt(request.params.id);
+  const eventId = parseInt(request.params.eventId);
   try {
     const event = await getEventByEventId(eventId);
-    if (event.length === 0) {
+    if (!event) {
       reply.status(404).send({
         success: false,
-        message: "Data not found",
+        message: "Event not found",
         data: null,
       });
     } else {
@@ -265,7 +211,7 @@ async function getEventByEventIdService(request, reply, done) {
 }
 
 async function updateEventPublishedService(request, reply, done) {
-  const eventId = parseInt(request.params.id);
+  const eventId = parseInt(request.params.eventId);
 
   const publishedEvent = await updateEventPublish(eventId);
   if (publishedEvent) {
@@ -321,15 +267,41 @@ async function searchEventService(request, reply, done) {
   }
 }
 
+async function getEventManagerInfoService(request, reply, done) {
+  const userId = parseInt(request.params.userId);
+  try {
+    const eventManagerInfo = await getEventManagerInfo(userId);
+    if (!eventManagerInfo) {
+      reply.status(404).send({
+        success: false,
+        message: "Event Manager not found",
+        data: null,
+      });
+    } else {
+      reply.send({
+        success: true,
+        message: "Event Manager fetched successfully",
+        data: eventManagerInfo,
+      });
+    }
+  } catch (error) {
+    console.error("Error in getEventManagerInfoService:", error);
+    reply.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      data: null,
+    });
+  }
+}
+
 export {
-  getAllEventsService,
   createEventService,
   updateEventService,
   deleteEventService,
-  getEventByUserIdService,
   uploadThumbnailService,
   getThumbnailByEventIdService,
   getEventByEventIdService,
   updateEventPublishedService,
   searchEventService,
+  getEventManagerInfoService,
 };

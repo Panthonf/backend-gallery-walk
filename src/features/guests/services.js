@@ -44,10 +44,7 @@ async function googleAuthCallbackService(request, reply) {
 
   request.session.set("user-guest", user);
   if (request.session.get("user-guest")) {
-    reply.send({
-      status: "success",
-      data: request.session.get("user-guest"),
-    });
+    reply.redirect(process.env.FRONTEND_URL + "/guest/event/");
   } else {
     reply.send({
       status: "fail",
@@ -121,6 +118,16 @@ async function getEventByEventIdService(request, reply) {
     data: event,
   });
 }
+
+async function isLoggedInService(request, reply) {
+  const user = request.session.get("user-guest");
+  if (user) {
+    reply.send({ authenticated: true, user });
+  } else {
+    reply.send({ authenticated: false, user: null });
+  }
+}
+
 export {
   googleAuthCallbackService,
   oauthConfig,
@@ -128,4 +135,5 @@ export {
   guestLogout,
   setSession,
   getEventByEventIdService,
+  isLoggedInService,
 };

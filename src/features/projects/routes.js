@@ -2,6 +2,8 @@ import {
   createProjectService,
   addProjectMemberService,
   getProjectByUserIdService,
+  getProjectByEventIdService,
+  searchProjectService,
 } from "./services.js";
 
 export default async (fastify) => {
@@ -22,4 +24,8 @@ export default async (fastify) => {
     { preValidation: [fastify.checkSessionMiddleware] },
     getProjectByUserIdService
   );
+
+  fastify.get("/:eventId", getProjectByEventIdService);
+
+  fastify.get("/:eventId/search", searchProjectService);
 };

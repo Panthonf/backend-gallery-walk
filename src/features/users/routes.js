@@ -1,15 +1,13 @@
 import {
   getAllUsersController,
-  createUserController,
   deleteUserController,
   getUserByIdController,
-  getUserByEmailService
+  getUserByUserIdService,
 } from "./services.js";
 
 export default async (fastify) => {
   fastify.get("/", getAllUsersController);
   fastify.get("/profile", getUserByIdController);
-  fastify.post("/", createUserController);
-  fastify.delete("/:id", deleteUserController);
-  fastify.get("/:email", getUserByEmailService)
+  fastify.get("/:userId", getUserByUserIdService);
+  fastify.delete("/:userId", deleteUserController);
 };

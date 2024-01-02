@@ -35,4 +35,45 @@ async function getProjectByUserId(userId) {
   return projects;
 }
 
-export { createProject, addProjectMember, getProjectByUserId };
+async function getProjectsByEventId(eventId) {
+  const projects = await prisma.projects.findMany({
+    where: {
+      event_id: eventId,
+    },
+  });
+  return projects;
+}
+
+async function searchProjectByEventId(searchData, eventId) {
+  const projects = await prisma.projects.findMany({
+    where: {
+      OR: [
+        {
+          title: {
+            contains: searchData,
+            mode: "insensitive",
+          },
+        },
+        {
+          description: {
+            contains: searchData,
+            mode: "insensitive",
+          },
+        },
+      ],
+      event_id: eventId,
+    },
+    orderBy: {
+      created_at: "desc",
+    },
+  });
+  return projects;
+}
+
+export {
+  createProject,
+  addProjectMember,
+  getProjectByUserId,
+  getProjectsByEventId,
+  searchProjectByEventId,
+};

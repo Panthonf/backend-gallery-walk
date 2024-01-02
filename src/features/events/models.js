@@ -1,11 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-async function getAllEvents() {
-  const events = await prisma.events.findMany();
-  return events;
-}
-
 async function createEvent(eventData) {
   const event = await prisma.events.create({
     data: {
@@ -60,18 +55,6 @@ async function deleteEvent(eventId) {
     },
   });
   return event;
-}
-
-async function getEventByUserId(userId) {
-  const events = await prisma.events.findMany({
-    where: {
-      user_id: userId,
-    },
-    orderBy: {
-      created_at: "desc",
-    },
-  });
-  return events;
 }
 
 async function uploadThumbnail(thumbnailData) {
@@ -159,15 +142,34 @@ async function searchEvent(searchData, userId) {
   return events;
 }
 
+async function getEventManagerInfo(userId) {
+  const eventManagerInfo = await prisma.users.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      first_name_en: true,
+      last_name_en: true,
+      first_name_th: true,
+      last_name_th: true,
+      email: true,
+      profile_pic: true,
+      affiliation: true,
+    },
+  });
+
+  return eventManagerInfo;
+}
+
 export {
-  getAllEvents,
   createEvent,
   updateEvent,
   deleteEvent,
-  getEventByUserId,
   uploadThumbnail,
   getThumbnailByEventId,
   getEventByEventId,
   updateEventPublish,
   searchEvent,
+  getEventManagerInfo,
 };

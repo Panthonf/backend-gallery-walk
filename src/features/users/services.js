@@ -1,9 +1,7 @@
 import {
   getAllUsers,
   deleteUser,
-  createUser,
   getUserById,
-  getUserByEmail,
 } from "./models.js";
 
 async function getAllUsersController(request, reply, done) {
@@ -32,35 +30,8 @@ async function getAllUsersController(request, reply, done) {
   }
 }
 
-async function createUserController(request, reply, done) {
-  const userData = request.body;
-
-  if ((await getUserByEmail(userData.email)) != null) {
-    reply.status(409).send({
-      success: false,
-      message: "User already exists",
-      data: null,
-    });
-    done();
-  }
-  try {
-    const newUser = await createUser(userData);
-    reply.status(201).send({
-      success: true,
-      message: "User created successfully",
-      data: newUser,
-    });
-  } catch ({ name, message }) {
-    reply.status(500).send({
-      success: false,
-      message: name + ": " + message,
-      data: null,
-    });
-  }
-}
-
 async function deleteUserController(request, reply) {
-  const userId = parseInt(request.params.id);
+  const userId = parseInt(request.params.userId);
   try {
     const deletedUser = await deleteUser(userId);
     if (deletedUser) {
@@ -109,10 +80,10 @@ async function getUserByIdController(request, reply) {
   }
 }
 
-async function getUserByEmailService(request, reply) {
-  const email = request.params.email;
+async function getUserByUserIdService(request, reply) {
+  const userId = parseInt(request.params.userId);
   try {
-    const user = await getUserByEmail(email);
+    const user = await getUserById(userId);
     if (user) {
       reply.send(user);
     } else {
@@ -132,10 +103,11 @@ async function getUserByEmailService(request, reply) {
   }
 }
 
+
+
 export {
   getAllUsersController,
-  createUserController,
   deleteUserController,
   getUserByIdController,
-  getUserByEmailService
+  getUserByUserIdService,
 };

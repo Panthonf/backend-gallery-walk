@@ -2,13 +2,12 @@ import {
   createEventService,
   updateEventService,
   deleteEventService,
-  getEventByUserIdService,
   uploadThumbnailService,
-  getAllEventsService,
   getThumbnailByEventIdService,
   getEventByEventIdService,
   updateEventPublishedService,
   searchEventService,
+  getEventManagerInfoService,
 } from "./services.js";
 
 const schema = {
@@ -42,6 +41,12 @@ const schema = {
 };
 
 export default async (fastify) => {
+  fastify.get("/", async (request, reply) => {
+    reply.send({
+      message: "/events",
+    });
+  });
+
   fastify.post(
     "/",
     {
@@ -52,26 +57,22 @@ export default async (fastify) => {
   );
 
   fastify.get(
-    "/by-user",
+    "/:eventId",
     { preValidation: [fastify.checkSessionMiddleware] },
-    getEventByUserIdService
+    getEventByEventIdService
   );
-
-  fastify.get("/", getAllEventsService);
-
-  fastify.get("/:id", getEventByEventIdService);
-
-  fastify.put("/:id", updateEventService);
-  fastify.delete("/:id", deleteEventService);
-  fastify.post("/upload/thumbnail/:id", uploadThumbnailService);
-
-  fastify.get("/thumbnail/:eventId", getThumbnailByEventIdService);
-
-  fastify.put("/:id/publish", updateEventPublishedService);
-
   fastify.get(
     "/search",
     { preValidation: [fastify.checkSessionMiddleware] },
     searchEventService
   );
+
+  fastify.put("/:eventId", updateEventService);
+  fastify.delete("/:eventId", deleteEventService);
+
+  fastify.put("/:eventId/publish", updateEventPublishedService);
+  fastify.get("/event-manager-info/:userId", getEventManagerInfoService);
+
+  fastify.post("/upload/thumbnail/:eventId", uploadThumbnailService);
+  fastify.get("/thumbnail/:eventId", getThumbnailByEventIdService);
 };
