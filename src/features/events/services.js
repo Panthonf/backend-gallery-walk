@@ -255,6 +255,7 @@ async function searchEventService(request, reply, done) {
         success: true,
         message: "Events fetched successfully",
         data: paginatedEvents,
+        totalEvents: allEvents.length,
       });
     }
   } catch (error) {
