@@ -80,3 +80,16 @@ model virtual_moneys {
   created_at DateTime? @default(now()) @db.Timestamp(6)
   updated_at DateTime? @db.Timestamp(6)
 }
+
+model guests {
+  id               Int       @id @default(autoincrement())
+  first_name_th    String?   @db.VarChar(255)
+  last_name_th     String?   @db.VarChar(255)
+  first_name_en    String?   @db.VarChar(255)
+  last_name_en     String?   @db.VarChar(255)
+  email            String?   @db.VarChar(255)
+  profile_pic      String?   @db.VarChar(255)
+  virtual_money    Int?
+  last_activity_at DateTime? @db.Timestamp(6)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+}
