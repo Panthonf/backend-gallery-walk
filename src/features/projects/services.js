@@ -4,6 +4,7 @@ import {
   getProjectByUserId,
   getProjectsByEventId,
   searchProjectByEventId,
+  getProjectByProjectId,
 } from "./models.js";
 
 async function createProjectService(req, reply, done) {
@@ -135,10 +136,45 @@ async function searchProjectService(request, reply, done) {
   }
 }
 
+async function getProjectByProjectIdService(req, rep, done) {
+  const projectId = parseInt(req.params.projectId);
+
+  projectId === null
+    ? rep.send({
+        message: "not have project id, please provide project id",
+        error: true,
+        data: null,
+      })
+    : "";
+
+  try {
+    const data = await getProjectByProjectId(projectId);
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "fetched project successfully",
+      success: true,
+      data: data,
+    });
+  } catch {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+}
+
 export {
   createProjectService,
   addProjectMemberService,
   getProjectByUserIdService,
   getProjectByEventIdService,
   searchProjectService,
+  getProjectByProjectIdService,
 };

@@ -70,10 +70,21 @@ async function searchProjectByEventId(searchData, eventId) {
   return projects;
 }
 
+async function getProjectByProjectId(projectId) {
+  const project = await prisma.projects.findUnique({
+    where: {
+      id: projectId,
+    },
+  });
+
+  return project;
+}
+
 export {
   createProject,
   addProjectMember,
   getProjectByUserId,
   getProjectsByEventId,
   searchProjectByEventId,
+  getProjectByProjectId,
 };

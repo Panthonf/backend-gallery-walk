@@ -4,6 +4,7 @@ import {
   getProjectByUserIdService,
   getProjectByEventIdService,
   searchProjectService,
+  getProjectByProjectIdService,
 } from "./services.js";
 
 export default async (fastify) => {
@@ -28,4 +29,6 @@ export default async (fastify) => {
   fastify.get("/:eventId", getProjectByEventIdService);
 
   fastify.get("/:eventId/search", searchProjectService);
+
+  fastify.get("/get-data/:projectId", getProjectByProjectIdService);
 };
