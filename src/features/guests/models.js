@@ -15,4 +15,27 @@ async function getAllEvents() {
   return events;
 }
 
-export { getEventByEventId, getAllEvents };
+async function createGuest(guestData) {
+  const guest = await prisma.guests.create({
+    data: {
+      first_name_th: guestData.first_name_th,
+      last_name_th: guestData.last_name_th,
+      first_name_en: guestData.first_name_en,
+      last_name_en: guestData.last_name_en,
+      email: guestData.email,
+      profile_pic: guestData.profile_pic,
+    },
+  });
+  return guest;
+}
+
+async function checkGuest(email) {
+  const guest = await prisma.guests.findMany({
+    where: {
+      email: email,
+    },
+  });
+  return guest;
+}
+
+export { getEventByEventId, getAllEvents, createGuest, checkGuest };
