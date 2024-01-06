@@ -1,6 +1,7 @@
 import axios from "axios";
 import oauthPlugin from "@fastify/oauth2";
-import { getEventByEventId } from "./models.js";
+import { checkGuest, getEventByEventId } from "./models.js";
+import { createGuest } from "./models.js";
 
 const oauthConfig = {
   scope: ["profile", "email"],
@@ -16,7 +17,7 @@ const oauthConfig = {
   callbackUri: process.env.CALLBACK_URI_GUEST,
 };
 
-async function googleAuthCallbackService(request, reply) {
+async function googleAuthCallbackService(request, reply, done) {
   const { token } =
     await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
 
@@ -39,15 +40,33 @@ async function googleAuthCallbackService(request, reply) {
     last_name_en: userInfo.family_name,
     email: userInfo.email,
     profile_pic: userInfo.picture,
-    affiliation: "",
   };
 
-  request.session.set("user-guest", user);
-  if (request.session.get("user-guest")) {
-    reply.redirect(process.env.FRONTEND_URL + "/guest/event/");
-  } else {
+  try {
+    // Fetch guest details only once
+    const guest = await checkGuest(userInfo.email);
+
+    if (guest) {
+      request.session.set("user-guest", guest.id);
+      reply.redirect(process.env.FRONTEND_URL + "/guest/event");
+    } else {
+      const newGuest = await createGuest(user);
+      if (newGuest) {
+        request.session.set("user-guest", newGuest.id);
+        reply.redirect(process.env.FRONTEND_URL + "/guest/event");
+      } else {
+        reply.send({
+          success: false,
+          message: "Cannot create new guest",
+          data: null,
+        });
+      }
+    }
+  } catch (error) {
+    console.error(error);
     reply.send({
-      status: "fail",
+      success: false,
+      message: "Internal Server Error",
       data: null,
     });
   }
