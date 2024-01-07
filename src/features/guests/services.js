@@ -1,6 +1,11 @@
 import axios from "axios";
 import oauthPlugin from "@fastify/oauth2";
-import { checkGuest, getEventByEventId } from "./models.js";
+import {
+  checkGuest,
+  getEventByEventId,
+  getGuestData,
+  addVirtualMoney,
+} from "./models.js";
 import { createGuest } from "./models.js";
 
 const oauthConfig = {
@@ -42,33 +47,32 @@ async function googleAuthCallbackService(request, reply, done) {
     profile_pic: userInfo.picture,
   };
 
-  try {
-    // Fetch guest details only once
-    const guest = await checkGuest(userInfo.email);
+  const guest = await checkGuest(userInfo.email);
 
-    if (guest) {
-      request.session.set("user-guest", guest.id);
-      reply.redirect(process.env.FRONTEND_URL + "/guest/event");
+  const eventId = request.session.get("eventId");
+
+  if (guest.length > 1) {
+    request.session.set("user-guest", guest[0].id);
+
+    reply.redirect(
+      `${
+        process.env.FRONTEND_URL
+      }/guest/event/${eventId}?guestId=${request.session.get("user-guest")}`
+    );
+  } else {
+    const newGuest = await createGuest(user);
+    if (newGuest) {
+      request.session.set("user-guest", newGuest.id);
+      reply.redirect(
+        `${process.env.FRONTEND_URL}/guest/event/${eventId}?guestId=${newGuest.id}`
+      );
     } else {
-      const newGuest = await createGuest(user);
-      if (newGuest) {
-        request.session.set("user-guest", newGuest.id);
-        reply.redirect(process.env.FRONTEND_URL + "/guest/event");
-      } else {
-        reply.send({
-          success: false,
-          message: "Cannot create new guest",
-          data: null,
-        });
-      }
+      reply.send({
+        success: false,
+        message: "Cannot create new guest",
+        data: null,
+      });
     }
-  } catch (error) {
-    console.error(error);
-    reply.send({
-      success: false,
-      message: "Internal Server Error",
-      data: null,
-    });
   }
 }
 
@@ -123,6 +127,7 @@ async function setSession(request, reply) {
 
 async function getEventByEventIdService(request, reply) {
   const eventId = parseInt(request.params.eventId);
+  
   const event = await getEventByEventId(eventId);
   if (!event) {
     reply.status(404).send({
@@ -147,6 +152,59 @@ async function isLoggedInService(request, reply) {
   }
 }
 
+async function getGuestDataService(req, rep, done) {
+  const guestId = req.session.get("user-guest");
+  if (req.session.get("user-guest")) {
+    const data = await getGuestData(guestId);
+    if (data) {
+      rep.send({
+        success: true,
+        message: "Guest data fetched successfully",
+        data: data,
+      });
+    } else {
+      rep.send({
+        success: false,
+        message: "Guest data not found",
+        data: null,
+      });
+    }
+  } else {
+    rep.send({
+      success: false,
+      message: "User not logged in",
+      data: null,
+    });
+  }
+}
+
+async function addVirtualMoneyService(req, rep, done) {
+  const virtualMoney = req.params.total;
+  const guestId = req.session.get("user-guest");
+  if (virtualMoney < 0 || virtualMoney == 0) {
+    rep.send({
+      success: false,
+      message: "Virtual money must be more than 0",
+      data: null,
+    });
+  } else {
+    const newVirtualMoney = await addVirtualMoney(virtualMoney, guestId);
+    if (newVirtualMoney) {
+      rep.send({
+        success: true,
+        message: "Virtual money added successfully",
+        data: newVirtualMoney,
+      });
+    } else {
+      rep.send({
+        success: false,
+        message: "Cannot add virtual money",
+        data: null,
+      });
+    }
+  }
+}
+
 export {
   googleAuthCallbackService,
   oauthConfig,
@@ -155,4 +213,6 @@ export {
   setSession,
   getEventByEventIdService,
   isLoggedInService,
+  getGuestDataService,
+  addVirtualMoneyService,
 };
