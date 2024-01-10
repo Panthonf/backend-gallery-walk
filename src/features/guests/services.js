@@ -5,8 +5,14 @@ import {
   getEventByEventId,
   getGuestData,
   addVirtualMoney,
+  saveVirtualMoney,
+  addProjectVirtualMoney,
+  updateGuestVirtualMoney,
+  addProjectComment,
+  getProjectComments,
 } from "./models.js";
 import { createGuest } from "./models.js";
+import { parse } from "dotenv";
 
 const oauthConfig = {
   scope: ["profile", "email"],
@@ -51,18 +57,36 @@ async function googleAuthCallbackService(request, reply, done) {
 
   const eventId = request.session.get("eventId");
 
-  if (guest.length > 1) {
-    request.session.set("user-guest", guest[0].id);
-
+  if (guest.length >= 1) {
+    request.session.set("guest", guest[0].id);
+    const virtualMoneySaved = saveVirtualMoney(guest[0].id, parseInt(eventId));
+    if (!virtualMoneySaved) {
+      reply.send({
+        success: false,
+        message: "Cannot save virtual money",
+        data: null,
+      });
+    }
     reply.redirect(
       `${
         process.env.FRONTEND_URL
-      }/guest/event/${eventId}?guestId=${request.session.get("user-guest")}`
+      }/guest/event/${eventId}?guestId=${await request.session.get("guest")}`
     );
   } else {
     const newGuest = await createGuest(user);
     if (newGuest) {
-      request.session.set("user-guest", newGuest.id);
+      request.session.set("guest", newGuest.id);
+      const virtualMoneySaved = saveVirtualMoney(
+        newGuest.id,
+        parseInt(eventId)
+      );
+      if (!virtualMoneySaved) {
+        reply.send({
+          success: false,
+          message: "Cannot save virtual money",
+          data: null,
+        });
+      }
       reply.redirect(
         `${process.env.FRONTEND_URL}/guest/event/${eventId}?guestId=${newGuest.id}`
       );
@@ -77,7 +101,7 @@ async function googleAuthCallbackService(request, reply, done) {
 }
 
 async function guestLogin(request, reply) {
-  const data = request.session.get("user-guest");
+  const data = request.session.get("guest");
   if (data) {
     reply.send({
       success: true,
@@ -111,11 +135,11 @@ async function guestLogout(request, reply) {
 }
 
 async function setSession(request, reply) {
-  request.session.set("user-guest", { id: 1, name: "John Doe" });
-  if (request.session.get("user-guest")) {
+  request.session.set("guest", { id: 1, name: "John Doe" });
+  if (request.session.get("guest")) {
     reply.send({
       status: "success",
-      data: request.session.get("user-guest"),
+      data: request.session.get("guest"),
     });
   }
 
@@ -127,7 +151,7 @@ async function setSession(request, reply) {
 
 async function getEventByEventIdService(request, reply) {
   const eventId = parseInt(request.params.eventId);
-  
+
   const event = await getEventByEventId(eventId);
   if (!event) {
     reply.status(404).send({
@@ -144,7 +168,7 @@ async function getEventByEventIdService(request, reply) {
 }
 
 async function isLoggedInService(request, reply) {
-  const user = request.session.get("user-guest");
+  const user = request.session.get("guest");
   if (user) {
     reply.send({ authenticated: true, user });
   } else {
@@ -153,8 +177,8 @@ async function isLoggedInService(request, reply) {
 }
 
 async function getGuestDataService(req, rep, done) {
-  const guestId = req.session.get("user-guest");
-  if (req.session.get("user-guest")) {
+  const guestId = req.session.get("guest");
+  if (req.session.get("guest")) {
     const data = await getGuestData(guestId);
     if (data) {
       rep.send({
@@ -180,7 +204,7 @@ async function getGuestDataService(req, rep, done) {
 
 async function addVirtualMoneyService(req, rep, done) {
   const virtualMoney = req.params.total;
-  const guestId = req.session.get("user-guest");
+  const guestId = req.session.get("guest");
   if (virtualMoney < 0 || virtualMoney == 0) {
     rep.send({
       success: false,
@@ -205,6 +229,137 @@ async function addVirtualMoneyService(req, rep, done) {
   }
 }
 
+async function giveVirtualMoneyService(req, rep, done) {
+  const virtualMoney = req.body.amount;
+  const guestId = parseInt(req.query.guestId);
+  const projectId = parseInt(req.query.projectId);
+
+  if (!virtualMoney) {
+    rep.send({
+      success: false,
+      message: "Virtual money not found",
+      data: virtualMoney,
+    });
+  }
+
+  if (!projectId) {
+    rep.send({
+      success: false,
+      message: "Project id not found",
+      data: null,
+    });
+  }
+
+  if (virtualMoney < 0 || virtualMoney == 0) {
+    rep.send({
+      success: false,
+      message: "Virtual money must be more than 0",
+      data: null,
+    });
+  } else {
+    const newVirtualMoney = await addProjectVirtualMoney(
+      virtualMoney,
+      projectId
+    );
+
+    if (!newVirtualMoney) {
+      rep.send({
+        success: false,
+        message: "Cannot add project virtual money",
+        data: null,
+      });
+    }
+
+    const updateSuccessful = await updateGuestVirtualMoney(
+      virtualMoney,
+      guestId
+    );
+
+    if (updateSuccessful) {
+      rep.send({
+        success: true,
+        message: "Guest virtual money updated successfully",
+        data: newVirtualMoney,
+      });
+    } else {
+      rep.send({
+        success: false,
+        message: "Cannot update guest virtual money",
+        data: null,
+      });
+    }
+
+    rep.send({
+      success: true,
+      message: "Virtual money added successfully",
+      data: newVirtualMoney,
+    });
+  }
+}
+
+async function addProjectCommentService(req, rep, done) {
+  const projectId = parseInt(req.body.projectId);
+  const comment = req.body.comment;
+
+  if (!projectId) {
+    rep.send({
+      success: false,
+      message: "Project id not found",
+      data: null,
+    });
+  }
+
+  if (!comment) {
+    rep.send({
+      success: false,
+      message: "Comments not found",
+      data: null,
+    });
+  }
+
+  const newProjectComment = await addProjectComment(projectId, comment);
+  if (!newProjectComment) {
+    rep.send({
+      success: false,
+      message: "Cannot add project comment",
+      data: null,
+    });
+  }
+
+  rep.send({
+    success: true,
+    message: "Project comment added successfully",
+    data: newProjectComment,
+  });
+}
+
+async function getProjectCommentsService(req, rep, done) {
+  const { projectId } = req.query;
+
+  if (!projectId) {
+    rep.send({
+      success: false,
+      message: "Project id not found",
+      data: null,
+    });
+  }
+
+  const projectComments = await getProjectComments(parseInt(projectId));
+  if (!projectComments) {
+    rep.send({
+      success: false,
+      message: "Cannot get project comments",
+      data: null,
+    });
+  }
+
+  rep.send({
+    success: true,
+    message: "Project comments fetched successfully",
+    data: projectComments,
+  });
+}
+
 export {
   googleAuthCallbackService,
   oauthConfig,
@@ -215,4 +370,7 @@ export {
   isLoggedInService,
   getGuestDataService,
   addVirtualMoneyService,
+  giveVirtualMoneyService,
+  addProjectCommentService,
+  getProjectCommentsService,
 };

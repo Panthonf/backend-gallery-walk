@@ -9,7 +9,7 @@ const server = Fastify({ logger: true });
 
 server.register(import("@fastify/cors"), {
   origin: "http://localhost:5173", // Replace with your frontend URL
-  // methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   // allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 });
@@ -21,17 +21,18 @@ server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 server.decorate("isGuestLoggedIn", isGuestLoggedIn);
 
-server.register(import("@fastify/secure-session"), {
+const secureSession = import("@fastify/secure-session");
+server.register(secureSession, {
   secret: process.env.SECRET_KEY,
   cookie: {
     path: "/",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Use true in production
-    sameSite: "lax", // Adjust sameSite based on your requirements
+    secure: false, // Change to true if using HTTPS
+    sameSite: "lax",
   },
-  cookieName: "Set-Cookie",
   saveUninitialized: false,
   resave: false,
+  cookieName: "Set-Cookie", // This should be the name of the cookie header
 });
 
 await server.register(import("@fastify/swagger"));
@@ -68,9 +69,5 @@ server.register(import("./features/guests/routes.js"), { prefix: "/guests" });
 // fastify.register(require('./routes/productRoutes'));
 
 server.register(import("./middleware/auth.js"));
-
-server.get("/healthcheck", async (req, res) => {
-  return { status: "ok" };
-});
 
 export default server;

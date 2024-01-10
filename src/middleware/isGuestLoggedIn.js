@@ -1,5 +1,5 @@
 function isGuestLoggedIn(request, reply, done) {
-  if (request.session.get("user-guest")) {
+  if (request.session.get("guest")) {
     done();
   } else {
     reply.status(401).send({

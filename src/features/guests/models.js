@@ -80,6 +80,171 @@ async function addVirtualMoney(guestId, virtualMoney) {
   return guest;
 }
 
+const saveVirtualMoney = async (guestId, eventId) => {
+  const guest = await prisma.guests.findUnique({
+    where: {
+      id: guestId,
+      virtual_money: { not: null },
+    },
+    select: {
+      virtual_money: true,
+    },
+  });
+
+  if (!guest) {
+    const event = await prisma.events.findUnique({
+      where: {
+        id: eventId,
+      },
+      select: {
+        virtual_money: true,
+      },
+    });
+
+    const addGuestVirtualMoney = await prisma.guests.update({
+      where: {
+        id: guestId,
+      },
+      data: {
+        virtual_money: event.virtual_money,
+      },
+      select: {
+        virtual_money: true,
+      },
+    });
+
+    return addGuestVirtualMoney;
+  }
+  return guest;
+};
+
+async function addProjectVirtualMoney(virtualMoney, projectId) {
+  try {
+    const existingProject = await prisma.virtual_moneys.findFirst({
+      where: {
+        project_id: projectId,
+      },
+      select: {
+        amount: true,
+        id: true,
+      },
+    });
+
+    if (!existingProject) {
+      const newVirtualMoney = await prisma.virtual_moneys.create({
+        data: {
+          project_id: projectId,
+          amount: virtualMoney,
+        },
+        select: {
+          amount: true,
+          project_id: true,
+        },
+      });
+      return newVirtualMoney.amount;
+    } else {
+      const newAmount = existingProject.amount + virtualMoney;
+      const updatedVirtualMoney = await prisma.virtual_moneys.update({
+        where: {
+          id: existingProject.id,
+        },
+        data: {
+          amount: newAmount,
+        },
+        select: {
+          amount: true,
+          project_id: true,
+        },
+      });
+      return updatedVirtualMoney.amount;
+    }
+  } catch (error) {
+    console.error("Error in addProjectVirtualMoney:", error);
+    throw error;
+  }
+}
+
+async function updateGuestVirtualMoney(virtualMoney, guestId) {
+  try {
+    const guest = await prisma.guests.findUnique({
+      where: {
+        id: guestId,
+      },
+      select: {
+        virtual_money: true,
+      },
+    });
+
+    const newVirtualMoney = Math.max(0, guest.virtual_money - virtualMoney);
+
+    await prisma.guests.update({
+      where: {
+        id: guestId,
+      },
+      data: {
+        virtual_money: newVirtualMoney,
+      },
+    });
+
+    return true; // Update successful
+  } catch (error) {
+    console.error("Error updating virtual money:", error);
+    // Handle the error appropriately (e.g., log it, throw a custom error, etc.)
+    return false; // Update failed
+  }
+}
+
+async function addProjectComment(projectId, comment) {
+  const newComment = await prisma.comments.create({
+    data: {
+      comment: comment,
+      project_id: projectId,
+    },
+  });
+  return newComment;
+}
+
+async function getProjectComments(projectId) {
+  const comments = await prisma.comments.findMany({
+    where: {
+      project_id: projectId,
+    },
+    select: {
+      id: true,
+      comment: true,
+      created_at: true,
+    },
+    orderBy: {
+      created_at: "desc",
+    },
+  });
+  return comments;
+}
+
+async function deleteGuestVirtualMoneyService(guestId, eventId) {
+  const event = await prisma.events.findUnique({
+    where: {
+      id: eventId,
+    },
+    select: {
+      virtual_money: true,
+    },
+  });
+
+  const updatedGuest = await prisma.guests.update({
+    where: {
+      id: guestId,
+    },
+    data: {
+      virtual_money: event.virtual_money,
+    },
+    select: {
+      virtual_money: true,
+    },
+  });
+
+  return updatedGuest;
+}
 
 export {
   getEventByEventId,
@@ -88,4 +253,10 @@ export {
   checkGuest,
   getGuestData,
   addVirtualMoney,
+  saveVirtualMoney,
+  updateGuestVirtualMoney,
+  addProjectVirtualMoney,
+  addProjectComment,
+  getProjectComments,
+  deleteGuestVirtualMoneyService,
 };

@@ -8,10 +8,14 @@ import {
   isLoggedInService,
   getGuestDataService,
   addVirtualMoneyService,
+  giveVirtualMoneyService,
+  addProjectCommentService,
+  getProjectCommentsService,
 } from "./services.js";
 
 import { getAllEvents } from "./models.js";
 import oauthPlugin from "@fastify/oauth2";
+import { deleteGuestVirtualMoneyService } from "./models.js";
 
 export default async (fastify) => {
   fastify.register(oauthPlugin, oauthConfig);
@@ -30,8 +34,6 @@ export default async (fastify) => {
 
   fastify.post("/virtual-money/:total", addVirtualMoneyService);
 
-  fastify.get("/data", getGuestDataService);
-
   fastify.get("/events", async (req, rep) => {
     try {
       const { eventId } = req.query;
@@ -44,11 +46,19 @@ export default async (fastify) => {
         });
       }
 
+      const guestId = await req.session.get("guest");
+      const eventIdSession = await req.session.get("eventId");
+      if (eventIdSession && eventIdSession !== eventId) {
+        const deleteGuestVirtual = await deleteGuestVirtualMoneyService(
+          guestId,
+          parseInt(eventId)
+        );
+      }
+
       // Set session variables
       req.session.set("eventId", eventId);
-      const guestId = await req.session.get("user-guest");
 
-      if (!req.session.get("user-guest")) {
+      if (!req.session.get("guest")) {
         rep.redirect(`${process.env.FRONTEND_URL}/guest/login`);
       } else {
         rep.redirect(
@@ -63,7 +73,7 @@ export default async (fastify) => {
 
   fastify.get("/check-guest-session", async (req, rep) => {
     try {
-      const guestIdSession = await req.session.get("user-guest");
+      const guestIdSession = await req.session.get("guest");
       const guestIdQuery = req.query.guestId;
       const eventIdSession = await req.session.get("eventId");
       const { eventId } = req.query;
@@ -96,4 +106,12 @@ export default async (fastify) => {
       rep.code(500).send(error);
     }
   });
+
+  fastify.get("/get-guest-data", getGuestDataService);
+
+  fastify.post("/give-virtual-money", giveVirtualMoneyService);
+
+  fastify.post("/add-comment", addProjectCommentService);
+
+  fastify.get("/get-project-comments", getProjectCommentsService);
 };
