@@ -46,12 +46,13 @@ model users {
   profile_pic   String?   @db.VarChar(255)
   created_at    DateTime? @default(now()) @db.Timestamp(6)
   updated_at    DateTime? @db.Timestamp(6)
+  role          String?   @db.VarChar
 }
 
 model projects {
   id          Int       @id @default(autoincrement())
   title       String?   @db.VarChar(255)
-  description String?   @db.Text
+  description String?
   user_id     Int
   event_id    Int
   created_at  DateTime? @default(now()) @db.Timestamp(6)
@@ -67,7 +68,7 @@ model project_members {
 
 model comments {
   id         Int       @id @default(autoincrement())
-  comment    String?   @db.Text
+  comment    String?
   project_id Int
   created_at DateTime? @default(now()) @db.Timestamp(6)
   updated_at DateTime? @db.Timestamp(6)

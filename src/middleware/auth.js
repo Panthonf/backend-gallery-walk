@@ -1,6 +1,7 @@
 import oauthPlugin from "@fastify/oauth2";
 import axios from "axios";
 import { checkUser, createUser } from "../features/users/models.js";
+import { v4 as uuidv4 } from "uuid";
 
 const CALLBACK_URI =
   process.env.CALLBACK_URI || "http://localhost:8080/login/google/callback";
@@ -53,6 +54,10 @@ export default async (fastify) => {
       const newUser = await createUser(user);
       if (newUser) {
         request.session.set("user", newUser.id);
+        if (await request.session.get("presenter")) {
+          const eventId = await request.session.get("eventId");
+          reply.redirect(`${process.env.FRONTEND_URL}/event/${eventId}`);
+        }
         reply.redirect(process.env.FRONTEND_URL + "/dashboard");
       } else {
         reply.redirect(process.env.FRONTEND_URL + "/login");
@@ -61,6 +66,10 @@ export default async (fastify) => {
 
     request.session.set("user", userCheck.id);
     if (request.session.get("user")) {
+      if (await request.session.get("presenter")) {
+        const eventId = await request.session.get("eventId");
+        reply.redirect(`${process.env.FRONTEND_URL}/event/${eventId}`);
+      }
       reply.redirect(process.env.FRONTEND_URL + "/dashboard");
     } else {
       reply.redirect(process.env.FRONTEND_URL + "/login");

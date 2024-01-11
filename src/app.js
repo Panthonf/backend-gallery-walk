@@ -67,6 +67,9 @@ server.register(import("./features/projects/routes.js"), {
 });
 server.register(import("./features/guests/routes.js"), { prefix: "/guests" });
 // fastify.register(require('./routes/productRoutes'));
+server.register(import("./features/presenters/routes.js"), {
+  prefix: "/presenters",
+});
 
 server.register(import("./middleware/auth.js"));
 

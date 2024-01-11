@@ -9,6 +9,7 @@ import {
   updateEventPublish,
   searchEvent,
   getEventManagerInfo,
+  getTotalProjectsByEventId,
 } from "./models.js";
 
 async function createEventService(req, reply, done) {
@@ -187,6 +188,7 @@ async function getEventByEventIdService(request, reply, done) {
   const eventId = parseInt(request.params.eventId);
   try {
     const event = await getEventByEventId(eventId);
+    const totalProjects = await getTotalProjectsByEventId(eventId);
     if (!event) {
       reply.status(404).send({
         success: false,
@@ -198,6 +200,7 @@ async function getEventByEventIdService(request, reply, done) {
         success: true,
         message: "Event fetched successfully",
         data: event,
+        totalProjects: totalProjects || 0,
       });
     }
   } catch (error) {

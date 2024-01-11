@@ -162,6 +162,15 @@ async function getEventManagerInfo(userId) {
   return eventManagerInfo;
 }
 
+async function getTotalProjectsByEventId(eventId) {
+  const totalProjects = await prisma.projects.count({
+    where: {
+      event_id: eventId,
+    },
+  });
+  return totalProjects;
+}
+
 export {
   createEvent,
   updateEvent,
@@ -172,4 +181,5 @@ export {
   updateEventPublish,
   searchEvent,
   getEventManagerInfo,
+  getTotalProjectsByEventId,
 };

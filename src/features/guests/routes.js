@@ -46,18 +46,23 @@ export default async (fastify) => {
         });
       }
 
+      // Check if guest is logged in
       const guestId = await req.session.get("guest");
+      if (!guestId) {
+        req.session.set("eventId", eventId);
+        rep.redirect(`${process.env.FRONTEND_URL}/guest/login`);
+      }
+
+      // Check if guest is logged in to the same event
       const eventIdSession = await req.session.get("eventId");
       if (eventIdSession && eventIdSession !== eventId) {
-        const deleteGuestVirtual = await deleteGuestVirtualMoneyService(
-          guestId,
-          parseInt(eventId)
-        );
+        await deleteGuestVirtualMoneyService(guestId, parseInt(eventId));
       }
 
       // Set session variables
       req.session.set("eventId", eventId);
 
+      // Get all events
       if (!req.session.get("guest")) {
         rep.redirect(`${process.env.FRONTEND_URL}/guest/login`);
       } else {
