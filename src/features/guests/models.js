@@ -35,15 +35,6 @@ async function checkGuest(email) {
     where: {
       email: email,
     },
-    select: {
-      id: true,
-      first_name_th: true,
-      last_name_th: true,
-      first_name_en: true,
-      last_name_en: true,
-      email: true,
-      profile_pic: true,
-    },
   });
   return guest;
 }
