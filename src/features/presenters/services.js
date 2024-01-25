@@ -52,6 +52,11 @@ async function createProjectService(req, rep) {
 async function getProjectByEventIdService(req, rep) {
   try {
     const eventId = parseInt(req.params.eventId);
+    const { query, page, pageSize } = req.query;
+
+    const start = (page - 1) * pageSize;
+    const end = page * pageSize;
+
 
     if (!eventId) {
       rep.send({
@@ -70,14 +75,16 @@ async function getProjectByEventIdService(req, rep) {
       });
     }
 
-    const project = await getProjectByEventId(eventId);
-    if (project.length < 1) {
+    const allProjects = await getProjectByEventId(eventId, query);
+    if (allProjects.length < 1) {
       rep.send({
         success: false,
         message: "Project not found",
         data: null,
       });
     }
+
+    const project = allProjects.slice(start, end);
 
     // Check if user is logged in
     const userSession = await req.session.get("user");

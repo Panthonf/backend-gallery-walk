@@ -13,13 +13,30 @@ async function createProject(userId, eventId, projectData) {
   return project;
 }
 
-async function getProjectByEventId(eventId) {
-  const project = await prisma.projects.findMany({
+async function getProjectByEventId(eventId, query) {
+  const projects = await prisma.projects.findMany({
     where: {
+      OR: [
+        {
+          title: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          description: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+      ],
       event_id: eventId,
     },
+    orderBy: {
+      created_at: "desc",
+    },
   });
-  return project;
+  return projects;
 }
 
 async function getUserIdByEventId(eventId) {

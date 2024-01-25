@@ -1,3 +1,4 @@
+import fastifyMultipart from "@fastify/multipart";
 import {
   createProjectService,
   addProjectMemberService,
@@ -5,6 +6,10 @@ import {
   getProjectByEventIdService,
   searchProjectService,
   getProjectByProjectIdService,
+  updateProjectService,
+  updateProjectDescriptionService,
+  getProjectVirtualMoneyService,
+  getProjectCommentsService
 } from "./services.js";
 
 export default async (fastify) => {
@@ -31,4 +36,15 @@ export default async (fastify) => {
   fastify.get("/:eventId/search", searchProjectService);
 
   fastify.get("/get-data/:projectId", getProjectByProjectIdService);
+
+  fastify.put("/update-title/:projectId", updateProjectService);
+
+  fastify.put(
+    "/update-description/:projectId",
+    updateProjectDescriptionService
+  );
+
+  fastify.get("/get-virtual-money/:projectId", getProjectVirtualMoneyService);
+
+  fastify.get("/get-comments/:projectId", getProjectCommentsService);
 };

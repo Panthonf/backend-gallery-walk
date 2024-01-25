@@ -5,6 +5,10 @@ import {
   getProjectsByEventId,
   searchProjectByEventId,
   getProjectByProjectId,
+  updateProject,
+  updateProjectDescription,
+  getProjectVirtualMoney,
+  getProjectComments,
 } from "./models.js";
 
 async function createProjectService(req, reply, done) {
@@ -51,11 +55,19 @@ async function addProjectMemberService(req, reply) {
   }
 }
 
+//  get project by user id
 async function getProjectByUserIdService(req, reply) {
   try {
+    const { query, page, pageSize } = req.query;
     const userId = req.session.get("user");
-    const projects = await getProjectByUserId(userId);
-    if (!projects) {
+    const allProjects = await getProjectByUserId(query, userId);
+
+    const start = (page - 1) * pageSize;
+    const end = page * pageSize;
+
+    const paginatedEvents = allProjects.slice(start, end);
+
+    if (paginatedEvents.length === 0) {
       reply.send({
         success: false,
         message: "get projects failed",
@@ -65,7 +77,8 @@ async function getProjectByUserIdService(req, reply) {
     reply.send({
       success: true,
       message: "get projects successfully",
-      data: projects,
+      data: paginatedEvents,
+      totalProjects: allProjects.length,
     });
   } catch (err) {
     reply.send({
@@ -170,6 +183,122 @@ async function getProjectByProjectIdService(req, rep, done) {
   }
 }
 
+async function updateProjectService(req, rep, done) {
+  const projectId = parseInt(req.params.projectId);
+  const projectData = req.body;
+
+  try {
+    const data = await updateProject(projectId, projectData.title);
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "updated project successfully",
+      success: true,
+      data: data,
+    });
+  } catch (error) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+}
+
+async function updateProjectDescriptionService(req, rep, done) {
+  const projectId = parseInt(req.params.projectId);
+  const projectData = req.body;
+
+  // rep.send({
+  //   message: "update project description successfully",
+  //   projectData: projectData.description,
+  //   projectId: projectId,
+  // });
+  // done();
+
+  try {
+    const data = await updateProjectDescription(
+      projectId,
+      projectData.description
+    );
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "updated project successfully",
+      success: true,
+      data: data,
+    });
+  } catch (error) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+}
+
+async function getProjectVirtualMoneyService(req, rep, done) {
+  const projectId = parseInt(req.params.projectId);
+
+  try {
+    const data = await getProjectVirtualMoney(projectId);
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "fetched project successfully",
+      success: true,
+      data: data,
+    });
+  } catch (err) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+}
+
+async function getProjectCommentsService(req, rep, done) {
+  const projectId = parseInt(req.params.projectId);
+
+  try {
+    const data = await getProjectComments(projectId);
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "fetched project successfully",
+      success: true,
+      data: data,
+    });
+  } catch (err) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+}
+
 export {
   createProjectService,
   addProjectMemberService,
@@ -177,4 +306,8 @@ export {
   getProjectByEventIdService,
   searchProjectService,
   getProjectByProjectIdService,
+  updateProjectService,
+  updateProjectDescriptionService,
+  getProjectVirtualMoneyService,
+  getProjectCommentsService,
 };

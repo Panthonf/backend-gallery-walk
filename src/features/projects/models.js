@@ -26,10 +26,27 @@ async function addProjectMember(memberData) {
   return member;
 }
 
-async function getProjectByUserId(userId) {
+async function getProjectByUserId(query, userId) {
   const projects = await prisma.projects.findMany({
     where: {
+      OR: [
+        {
+          title: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          description: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+      ],
       user_id: userId,
+    },
+    orderBy: {
+      created_at: "desc",
     },
   });
   return projects;
@@ -80,6 +97,63 @@ async function getProjectByProjectId(projectId) {
   return project;
 }
 
+const updateProject = async (projectId, title) => {
+  const project = await prisma.projects.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      title: title,
+    },
+  });
+
+  return project;
+};
+
+const updateProjectDescription = async (projectId, description) => {
+  const project = await prisma.projects.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      description: description,
+    },
+  });
+
+  return project;
+};
+
+async function getProjectVirtualMoney(projectId) {
+  try {
+    const virtualMoney = await prisma.virtual_moneys.aggregate({
+      where: {
+        project_id: projectId,
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    return virtualMoney._sum.amount || 0;
+  } catch (error) {
+    console.error("Error fetching virtual money:", error);
+    throw error;
+  }
+}
+
+async function getProjectComments(projectId) {
+  const comments = await prisma.comments.findMany({
+    where: {
+      project_id: projectId,
+    },
+    orderBy: {
+      created_at: "desc",
+    },
+  });
+
+  return comments;
+}
+
 export {
   createProject,
   addProjectMember,
@@ -87,4 +161,8 @@ export {
   getProjectsByEventId,
   searchProjectByEventId,
   getProjectByProjectId,
+  updateProject,
+  updateProjectDescription,
+  getProjectVirtualMoney,
+  getProjectComments,
 };
