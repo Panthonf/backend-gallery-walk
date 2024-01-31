@@ -298,6 +298,47 @@ async function getEventManagerInfoService(request, reply, done) {
   }
 }
 
+const checkEventRoleService = async (request, reply, done) => {
+  const userId = request.session.get("user");
+  const eventId = parseInt(request.params.eventId);
+  if (!userId)
+    reply
+      .status(401)
+      .send({ success: false, message: "Unauthorized", data: null });
+  try {
+    const event = await getEventByEventId(eventId);
+
+    if (!event) {
+      reply.status(404).send({
+        success: false,
+        message: "Event not found",
+        data: null,
+      });
+    } else {
+      if (event.user_id === userId) {
+        reply.send({
+          success: true,
+          message: "Event Manager",
+          role: "manager",
+        });
+      } else {
+        reply.send({
+          success: true,
+          message: "Participant",
+          role: "presenter",
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Error in checkEventRoleService:", error);
+    reply.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      data: null,
+    });
+  }
+};
+
 export {
   createEventService,
   updateEventService,
@@ -308,4 +349,5 @@ export {
   updateEventPublishedService,
   searchEventService,
   getEventManagerInfoService,
+  checkEventRoleService,
 };

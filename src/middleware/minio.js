@@ -1,14 +1,21 @@
 // minio.js
 import * as Minio from "minio";
 
-const minioClient = new Minio.Client({
-  endPoint: "minio-server-v8ax.onrender.com",
-  port: 443,
-  useSSL: true,
-  accessKey: "KSJTluQu9GI8RlRrTjJc",
-  secretKey: "BDnPGSl1EIIJfTfaVoQI8cb711Y424JCZqUpdEOm",
-});
+// const minioClient = new Minio.Client({
+//   endPoint: "minio-server-v8ax.onrender.com",
+//   port: 443,
+//   useSSL: true,
+//   accessKey: "KSJTluQu9GI8RlRrTjJc",
+//   secretKey: "BDnPGSl1EIIJfTfaVoQI8cb711Y424JCZqUpdEOm",
+// });
 
+const minioClient = new Minio.Client({
+  endPoint: '127.0.0.1',
+  port: 7001,
+  useSSL: false, // Change to true if your Minio server uses HTTPS
+  accessKey: 'minioadmin',
+  secretKey: 'miniopassword',
+});
 
 minioClient.bucketExists("project-bucket", function (err, exists) {
   if (err) {

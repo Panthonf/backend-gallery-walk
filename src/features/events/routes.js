@@ -8,6 +8,7 @@ import {
   updateEventPublishedService,
   searchEventService,
   getEventManagerInfoService,
+  checkEventRoleService,
 } from "./services.js";
 
 const schema = {
@@ -75,4 +76,6 @@ export default async (fastify) => {
 
   fastify.post("/upload/thumbnail/:eventId", uploadThumbnailService);
   fastify.get("/thumbnail/:eventId", getThumbnailByEventIdService);
+
+  fastify.get("/role/:eventId", checkEventRoleService);
 };
