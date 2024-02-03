@@ -23,31 +23,6 @@ async function createEvent(eventData) {
   return event;
 }
 
-async function updateEvent(eventId, updatedEventData) {
-  const event = await prisma.events.update({
-    where: {
-      id: eventId,
-    },
-    data: {
-      event_name: updatedEventData.event_name,
-      start_date: updatedEventData.start_date,
-      end_date: updatedEventData.end_date,
-      description: updatedEventData.description,
-      submit_start: updatedEventData.submit_start,
-      submit_end: updatedEventData.submit_end,
-      number_of_member: updatedEventData.number_of_member,
-      virtual_money: updatedEventData.virtual_money,
-      unit_money: updatedEventData.unit_money,
-      organization: updatedEventData.organization,
-      video_link: updatedEventData.video_link,
-      user_id: updatedEventData.user_id,
-      created_at: updatedEventData.created_at,
-      updated_at: updatedEventData.updated_at,
-    },
-  });
-  return event;
-}
-
 async function deleteEvent(eventId) {
   const event = await prisma.events.delete({
     where: {
@@ -171,9 +146,33 @@ async function getTotalProjectsByEventId(eventId) {
   return totalProjects;
 }
 
+const updateEvent = async (eventId, updatedEventData) => {
+  const event = await prisma.events.update({
+    where: {
+      id: eventId,
+    },
+    data: {
+      event_name: updatedEventData.event_name,
+      start_date: updatedEventData.start_date,
+      end_date: updatedEventData.end_date,
+      description: updatedEventData.description,
+      submit_start: updatedEventData.submit_start,
+      submit_end: updatedEventData.submit_end,
+      number_of_member: updatedEventData.number_of_member,
+      virtual_money: updatedEventData.virtual_money,
+      unit_money: updatedEventData.unit_money,
+      organization: updatedEventData.organization,
+      video_link: updatedEventData.video_link,
+      user_id: updatedEventData.user_id,
+      created_at: updatedEventData.created_at,
+      updated_at: new Date(),
+    },
+  });
+  return event;
+};
+
 export {
   createEvent,
-  updateEvent,
   deleteEvent,
   uploadThumbnail,
   getThumbnailByEventId,
@@ -182,4 +181,5 @@ export {
   searchEvent,
   getEventManagerInfo,
   getTotalProjectsByEventId,
+  updateEvent,
 };

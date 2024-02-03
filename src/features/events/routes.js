@@ -1,6 +1,5 @@
 import {
   createEventService,
-  updateEventService,
   deleteEventService,
   uploadThumbnailService,
   getThumbnailByEventIdService,
@@ -9,6 +8,7 @@ import {
   searchEventService,
   getEventManagerInfoService,
   checkEventRoleService,
+  updateEventService,
 } from "./services.js";
 
 const schema = {
@@ -57,6 +57,15 @@ export default async (fastify) => {
     createEventService
   );
 
+  fastify.put(
+    "/:eventId",
+    {
+      preValidation: [fastify.checkSessionMiddleware],
+      // schema,
+    },
+    updateEventService
+  );
+
   fastify.get(
     "/:eventId",
     { preValidation: [fastify.checkSessionMiddleware] },
@@ -68,7 +77,6 @@ export default async (fastify) => {
     searchEventService
   );
 
-  fastify.put("/:eventId", updateEventService);
   fastify.delete("/:eventId", deleteEventService);
 
   fastify.put("/:eventId/publish", updateEventPublishedService);

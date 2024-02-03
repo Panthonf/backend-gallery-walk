@@ -1,7 +1,6 @@
 import minioClient from "../../middleware/minio.js";
 import {
   createEvent,
-  updateEvent,
   deleteEvent,
   uploadThumbnail,
   getThumbnailByEventId,
@@ -10,6 +9,7 @@ import {
   searchEvent,
   getEventManagerInfo,
   getTotalProjectsByEventId,
+  updateEvent,
 } from "./models.js";
 
 async function createEventService(req, reply, done) {
@@ -46,30 +46,6 @@ async function createEventService(req, reply, done) {
     }
   } catch (error) {
     console.error("Error processing request:", error);
-    reply.status(500).send({
-      success: false,
-      message: error.message,
-      data: null,
-    });
-  }
-}
-
-async function updateEventService(request, reply, done) {
-  const eventId = parseInt(request.params.eventId);
-  const updatedEventData = request.body;
-  try {
-    const event = await updateEvent(eventId, updatedEventData);
-    if (event) {
-      reply.send(event);
-    } else {
-      reply.status(404).send({
-        success: false,
-        message: "Event not found",
-        data: null,
-      });
-    }
-  } catch (error) {
-    console.error(error);
     reply.status(500).send({
       success: false,
       message: error.message,
@@ -339,9 +315,32 @@ const checkEventRoleService = async (request, reply, done) => {
   }
 };
 
+const updateEventService = async (request, reply, done) => {
+  const eventId = parseInt(request.params.eventId);
+  const updatedEventData = request.body;
+  try {
+    const event = await updateEvent(eventId, updatedEventData);
+    if (event) {
+      reply.send(event);
+    } else {
+      reply.status(404).send({
+        success: false,
+        message: "Event not found",
+        data: null,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+}
+
 export {
   createEventService,
-  updateEventService,
   deleteEventService,
   uploadThumbnailService,
   getThumbnailByEventIdService,
@@ -350,4 +349,5 @@ export {
   searchEventService,
   getEventManagerInfoService,
   checkEventRoleService,
+  updateEventService
 };
