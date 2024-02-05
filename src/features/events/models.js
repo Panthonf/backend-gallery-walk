@@ -54,6 +54,15 @@ async function getThumbnailByEventId(eventId) {
   return thumbnail;
 }
 
+async function deleteThumbnail(eventId) {
+  const thumbnail = await prisma.thumbnails.deleteMany({
+    where: {
+      event_id: eventId,
+    },
+  });
+  return thumbnail;
+}
+
 async function getEventByEventId(eventId) {
   const event = await prisma.events.findUnique({
     where: {
@@ -182,4 +191,5 @@ export {
   getEventManagerInfo,
   getTotalProjectsByEventId,
   updateEvent,
+  deleteThumbnail,
 };

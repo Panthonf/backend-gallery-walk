@@ -10,6 +10,7 @@ import {
   getEventManagerInfo,
   getTotalProjectsByEventId,
   updateEvent,
+  deleteThumbnail,
 } from "./models.js";
 
 async function createEventService(req, reply, done) {
@@ -87,7 +88,51 @@ async function uploadThumbnailService(request, reply, done) {
   const thumbnailName = `${eventId}-${thumbnail.filename}`;
 
   try {
-    const upload = minioClient.putObject(
+    const thumbnailExists = await getThumbnailByEventId(eventId);
+    if (thumbnailExists.length > 0) {
+      const deletedThumbnail = await deleteThumbnail(eventId);
+      if (!deletedThumbnail) {
+        minioClient.putObject(
+          "event-bucket",
+          thumbnailName,
+          thumbnail.file,
+          function (err, etag) {
+            if (err) {
+              console.log(err);
+              return reply.status(500).send({
+                success: false,
+                message: "Error uploading file",
+                data: null,
+              });
+            }
+            console.log("File uploaded successfully.");
+          }
+        );
+
+        const thumbnailData = {
+          event_id: eventId,
+          thumbnail: thumbnailName,
+          thumbnail_url: `${process.env.MINIO_ENDPOINT}/event-bucket/${thumbnailName}`,
+        };
+
+        const thumbnailUploaded = await uploadThumbnail(thumbnailData);
+        if (thumbnailUploaded) {
+          reply.send({
+            success: true,
+            message: "Thumbnail uploaded successfully",
+            data: thumbnailUploaded,
+          });
+        } else {
+          reply.status(500).send({
+            success: false,
+            message: "Internal Server Error",
+            data: null,
+          });
+        }
+      }
+    }
+
+    minioClient.putObject(
       "event-bucket",
       thumbnailName,
       thumbnail.file,
@@ -337,7 +382,7 @@ const updateEventService = async (request, reply, done) => {
       data: null,
     });
   }
-}
+};
 
 export {
   createEventService,
@@ -349,5 +394,5 @@ export {
   searchEventService,
   getEventManagerInfoService,
   checkEventRoleService,
-  updateEventService
+  updateEventService,
 };
