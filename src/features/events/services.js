@@ -268,7 +268,14 @@ async function searchEventService(request, reply, done) {
     // Get the paginated subset from the entire dataset
     const paginatedEvents = allEvents.slice(start, end);
 
-    if (paginatedEvents.length === 0) {
+    const events = paginatedEvents.map(async (event) => {
+      return {
+        ...event,
+        total_projects: await getTotalProjectsByEventId(event.id),
+      };
+    });
+
+    if (events.length === 0) {
       reply.status(404).send({
         success: false,
         message: "Data not found",
@@ -278,8 +285,9 @@ async function searchEventService(request, reply, done) {
       reply.send({
         success: true,
         message: "Events fetched successfully",
-        data: paginatedEvents,
-        totalEvents: allEvents.length,
+        data: await Promise.all(events),
+        totalEvents: events.length,
+        dataPanthon: await getTotalProjectsByEventId(9),
       });
     }
   } catch (error) {
