@@ -10,11 +10,11 @@ import * as Minio from "minio";
 // });
 
 const minioClient = new Minio.Client({
-  endPoint: '127.0.0.1',
-  port: 7001,
-  useSSL: false, // Change to true if your Minio server uses HTTPS
-  accessKey: 'minioadmin',
-  secretKey: 'miniopassword',
+  endPoint: process.env.MINIO_ENDPOINT,
+  port: parseInt(process.env.MINIO_PORT),
+  useSSL: process.env.MINIO_USESSL === "true",
+  accessKey: process.env.MINIO_ACCESSKEY,
+  secretKey: process.env.MINIO_SECRETKEY,
 });
 
 minioClient.bucketExists("project-bucket", function (err, exists) {
