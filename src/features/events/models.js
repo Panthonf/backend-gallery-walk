@@ -18,31 +18,7 @@ async function createEvent(eventData) {
       user_id: eventData.user_id,
       created_at: eventData.created_at,
       updated_at: eventData.updated_at,
-    },
-  });
-  return event;
-}
-
-async function updateEvent(eventId, updatedEventData) {
-  const event = await prisma.events.update({
-    where: {
-      id: eventId,
-    },
-    data: {
-      event_name: updatedEventData.event_name,
-      start_date: updatedEventData.start_date,
-      end_date: updatedEventData.end_date,
-      description: updatedEventData.description,
-      submit_start: updatedEventData.submit_start,
-      submit_end: updatedEventData.submit_end,
-      number_of_member: updatedEventData.number_of_member,
-      virtual_money: updatedEventData.virtual_money,
-      unit_money: updatedEventData.unit_money,
-      organization: updatedEventData.organization,
-      video_link: updatedEventData.video_link,
-      user_id: updatedEventData.user_id,
-      created_at: updatedEventData.created_at,
-      updated_at: updatedEventData.updated_at,
+      location: eventData.location,
     },
   });
   return event;
@@ -72,6 +48,15 @@ async function uploadThumbnail(thumbnailData) {
 
 async function getThumbnailByEventId(eventId) {
   const thumbnail = await prisma.thumbnails.findMany({
+    where: {
+      event_id: eventId,
+    },
+  });
+  return thumbnail;
+}
+
+async function deleteThumbnail(eventId) {
+  const thumbnail = await prisma.thumbnails.deleteMany({
     where: {
       event_id: eventId,
     },
@@ -171,9 +156,34 @@ async function getTotalProjectsByEventId(eventId) {
   return totalProjects;
 }
 
+const updateEvent = async (eventId, updatedEventData) => {
+  const event = await prisma.events.update({
+    where: {
+      id: eventId,
+    },
+    data: {
+      event_name: updatedEventData.event_name,
+      start_date: updatedEventData.start_date,
+      end_date: updatedEventData.end_date,
+      description: updatedEventData.description,
+      submit_start: updatedEventData.submit_start,
+      submit_end: updatedEventData.submit_end,
+      number_of_member: updatedEventData.number_of_member,
+      virtual_money: updatedEventData.virtual_money,
+      unit_money: updatedEventData.unit_money,
+      organization: updatedEventData.organization,
+      video_link: updatedEventData.video_link,
+      user_id: updatedEventData.user_id,
+      created_at: updatedEventData.created_at,
+      updated_at: new Date(),
+      location: updatedEventData.location,
+    },
+  });
+  return event;
+};
+
 export {
   createEvent,
-  updateEvent,
   deleteEvent,
   uploadThumbnail,
   getThumbnailByEventId,
@@ -182,4 +192,6 @@ export {
   searchEvent,
   getEventManagerInfo,
   getTotalProjectsByEventId,
+  updateEvent,
+  deleteThumbnail,
 };

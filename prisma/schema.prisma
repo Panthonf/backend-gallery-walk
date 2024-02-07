@@ -17,6 +17,7 @@ model events {
   submit_end       DateTime? @db.Timestamp(6)
   number_of_member Int?
   virtual_money    Int?
+  location         String?   @db.VarChar(255)
   unit_money       String?   @db.VarChar(255)
   published        Boolean?  @default(false)
   organization     String?   @db.VarChar(255)

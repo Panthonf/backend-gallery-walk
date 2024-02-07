@@ -1,7 +1,6 @@
 import minioClient from "../../middleware/minio.js";
 import {
   createEvent,
-  updateEvent,
   deleteEvent,
   uploadThumbnail,
   getThumbnailByEventId,
@@ -10,6 +9,8 @@ import {
   searchEvent,
   getEventManagerInfo,
   getTotalProjectsByEventId,
+  updateEvent,
+  deleteThumbnail,
 } from "./models.js";
 
 async function createEventService(req, reply, done) {
@@ -54,30 +55,6 @@ async function createEventService(req, reply, done) {
   }
 }
 
-async function updateEventService(request, reply, done) {
-  const eventId = parseInt(request.params.eventId);
-  const updatedEventData = request.body;
-  try {
-    const event = await updateEvent(eventId, updatedEventData);
-    if (event) {
-      reply.send(event);
-    } else {
-      reply.status(404).send({
-        success: false,
-        message: "Event not found",
-        data: null,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    reply.status(500).send({
-      success: false,
-      message: error.message,
-      data: null,
-    });
-  }
-}
-
 async function deleteEventService(request, reply, done) {
   const eventId = parseInt(request.params.eventId);
   try {
@@ -111,7 +88,51 @@ async function uploadThumbnailService(request, reply, done) {
   const thumbnailName = `${eventId}-${thumbnail.filename}`;
 
   try {
-    const upload = minioClient.putObject(
+    const thumbnailExists = await getThumbnailByEventId(eventId);
+    if (thumbnailExists.length > 0) {
+      const deletedThumbnail = await deleteThumbnail(eventId);
+      if (!deletedThumbnail) {
+        minioClient.putObject(
+          "event-bucket",
+          thumbnailName,
+          thumbnail.file,
+          function (err, etag) {
+            if (err) {
+              console.log(err);
+              return reply.status(500).send({
+                success: false,
+                message: "Error uploading file",
+                data: null,
+              });
+            }
+            console.log("File uploaded successfully.");
+          }
+        );
+
+        const thumbnailData = {
+          event_id: eventId,
+          thumbnail: thumbnailName,
+          thumbnail_url: `${process.env.MINIO_ENDPOINT}/event-bucket/${thumbnailName}`,
+        };
+
+        const thumbnailUploaded = await uploadThumbnail(thumbnailData);
+        if (thumbnailUploaded) {
+          reply.send({
+            success: true,
+            message: "Thumbnail uploaded successfully",
+            data: thumbnailUploaded,
+          });
+        } else {
+          reply.status(500).send({
+            success: false,
+            message: "Internal Server Error",
+            data: null,
+          });
+        }
+      }
+    }
+
+    minioClient.putObject(
       "event-bucket",
       thumbnailName,
       thumbnail.file,
@@ -247,7 +268,14 @@ async function searchEventService(request, reply, done) {
     // Get the paginated subset from the entire dataset
     const paginatedEvents = allEvents.slice(start, end);
 
-    if (paginatedEvents.length === 0) {
+    const events = paginatedEvents.map(async (event) => {
+      return {
+        ...event,
+        total_projects: await getTotalProjectsByEventId(event.id),
+      };
+    });
+
+    if (events.length === 0) {
       reply.status(404).send({
         success: false,
         message: "Data not found",
@@ -257,8 +285,9 @@ async function searchEventService(request, reply, done) {
       reply.send({
         success: true,
         message: "Events fetched successfully",
-        data: paginatedEvents,
-        totalEvents: allEvents.length,
+        data: await Promise.all(events),
+        totalEvents: events.length,
+        dataPanthon: await getTotalProjectsByEventId(9),
       });
     }
   } catch (error) {
@@ -339,9 +368,32 @@ const checkEventRoleService = async (request, reply, done) => {
   }
 };
 
+const updateEventService = async (request, reply, done) => {
+  const eventId = parseInt(request.params.eventId);
+  const updatedEventData = request.body;
+  try {
+    const event = await updateEvent(eventId, updatedEventData);
+    if (event) {
+      reply.send(event);
+    } else {
+      reply.status(404).send({
+        success: false,
+        message: "Event not found",
+        data: null,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export {
   createEventService,
-  updateEventService,
   deleteEventService,
   uploadThumbnailService,
   getThumbnailByEventIdService,
@@ -350,4 +402,5 @@ export {
   searchEventService,
   getEventManagerInfoService,
   checkEventRoleService,
+  updateEventService,
 };

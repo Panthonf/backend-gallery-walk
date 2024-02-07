@@ -1,3 +1,4 @@
+import { getEventByEventId } from "../events/models.js";
 import {
   createProject,
   addProjectMember,
@@ -65,9 +66,15 @@ async function getProjectByUserIdService(req, reply) {
     const start = (page - 1) * pageSize;
     const end = page * pageSize;
 
-    const paginatedEvents = allProjects.slice(start, end);
+    const paginatedProjects = allProjects.slice(start, end);
 
-    if (paginatedEvents.length === 0) {
+    const projects = paginatedProjects.map(async (project) => {
+      const virtualMoney = await getProjectVirtualMoney(project.id);
+      const eventData = await getEventByEventId(project.event_id);
+      return { ...project, virtual_money: virtualMoney, event_data: eventData };
+    });
+
+    if (projects.length === 0) {
       reply.send({
         success: false,
         message: "get projects failed",
@@ -77,7 +84,7 @@ async function getProjectByUserIdService(req, reply) {
     reply.send({
       success: true,
       message: "get projects successfully",
-      data: paginatedEvents,
+      data: await Promise.all(projects),
       totalProjects: allProjects.length,
     });
   } catch (err) {
