@@ -86,4 +86,5 @@ export default async (fastify) => {
   fastify.get("/thumbnail/:eventId", getThumbnailByEventIdService);
 
   fastify.get("/role/:eventId", checkEventRoleService);
+
 };

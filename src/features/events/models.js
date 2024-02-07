@@ -18,6 +18,7 @@ async function createEvent(eventData) {
       user_id: eventData.user_id,
       created_at: eventData.created_at,
       updated_at: eventData.updated_at,
+      location: eventData.location,
     },
   });
   return event;
@@ -175,6 +176,7 @@ const updateEvent = async (eventId, updatedEventData) => {
       user_id: updatedEventData.user_id,
       created_at: updatedEventData.created_at,
       updated_at: new Date(),
+      location: updatedEventData.location,
     },
   });
   return event;
