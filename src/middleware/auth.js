@@ -253,7 +253,7 @@ export default async (fastify) => {
     if (user) {
       reply.send({ authenticated: true, user });
     } else {
-      reply.send({ authenticated: false, user: null });
+      reply.send({ authenticated: false, user });
     }
   });
 };
