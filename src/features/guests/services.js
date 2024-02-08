@@ -168,7 +168,7 @@ async function getEventByEventIdService(request, reply) {
 }
 
 async function isLoggedInService(request, reply) {
-  const user = request.session.get("guest");
+  const user = await request.session.get("guest");
   if (user) {
     reply.send({ authenticated: true, user });
   } else {
