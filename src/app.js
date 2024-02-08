@@ -27,7 +27,7 @@ server.register(secureSession, {
   cookie: {
     path: "/",
     httpOnly: true,
-    secure: false, // Change to true if using HTTPS
+    secure: true, // Change to true if using HTTPS
     sameSite: "lax",
   },
   saveUninitialized: false,
