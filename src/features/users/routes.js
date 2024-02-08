@@ -10,7 +10,7 @@ export default async (fastify) => {
   fastify.get("/profile", getUserByIdController);
   fastify.get("/:userId", getUserByUserIdService);
   fastify.delete("/:userId", deleteUserController);
-  fastify.get("get-session", async (request, reply) => {
+  fastify.get("/get-session", async (request, reply) => {
     const userId = await request.session.get("user");
     if (await request.session.get("user")) {
       reply.send({
