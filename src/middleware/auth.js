@@ -234,8 +234,8 @@ export default async (fastify) => {
   });
 
   fastify.get("/get-session", async (request, reply) => {
-    const userId = request.session.get("user");
-    if (request.session.get("user")) {
+    const userId = await request.session.get("user");
+    if (await request.session.get("user")) {
       reply.send({
         success: true,
         message: "User logged in successfully",
@@ -245,7 +245,7 @@ export default async (fastify) => {
       reply.send({
         success: false,
         message: "User not logged in",
-        data: null,
+        data: userId || null,
       });
     }
   });
