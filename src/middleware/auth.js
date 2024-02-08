@@ -53,7 +53,7 @@ export default async (fastify) => {
     if (!userCheck) {
       const newUser = await createUser(user);
       if (newUser) {
-        request.session.set("user", newUser.id);
+        await request.session.set("user", newUser.id);
         if (await request.session.get("presenter")) {
           const eventId = await request.session.get("eventId");
           reply.redirect(`${process.env.FRONTEND_URL}/event/${eventId}`);
@@ -64,8 +64,8 @@ export default async (fastify) => {
       }
     }
 
-    request.session.set("user", userCheck.id);
-    if (request.session.get("user")) {
+    await request.session.set("user", userCheck.id);
+    if (await request.session.get("user")) {
       if (await request.session.get("presenter")) {
         const eventId = await request.session.get("eventId");
         reply.redirect(`${process.env.FRONTEND_URL}/event/${eventId}`);
@@ -146,6 +146,8 @@ export default async (fastify) => {
         secure: true, // cookie will only be sent over HTTPS
         expires: new Date(Date.now() + 3600000), // cookie expires in 1 hour
       });
+
+      
 
       reply.send({
         // access_token: token.access_token,
@@ -253,7 +255,7 @@ export default async (fastify) => {
     if (user) {
       reply.send({ authenticated: true, user });
     } else {
-      reply.send({ authenticated: false, user });
+      reply.send({ authenticated: false, user: null });
     }
   });
 };
