@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import dotenv from "dotenv";
-// import { isLoggedIn } from "./middleware/isLoggedIn.js";
+import { isLoggedIn } from "./middleware/isLoggedIn.js";
 import { isGuestLoggedIn } from "./middleware/isGuestLoggedIn.js";
 import { checkSessionMiddleware } from "./middleware/checkSessionMiddleware.js";
 
@@ -8,7 +8,7 @@ dotenv.config();
 const server = Fastify({ logger: true });
 
 server.register(import("@fastify/cors"), {
-  origin: process.env.FRONTEND_URL,
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -17,7 +17,7 @@ server.register(import("@fastify/cors"), {
 server.register(import("@fastify/multipart"));
 
 server.register(import("@fastify/cookie"));
-// server.decorate("isLoggedIn", isLoggedIn);
+server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 server.decorate("isGuestLoggedIn", isGuestLoggedIn);
 
