@@ -9,9 +9,9 @@ const server = Fastify({ logger: true });
 
 server.register(import('@fastify/cors'), {
   origin: ["https://frontend-gallery-walk.vercel.app", "http://localhost:3000"], // Specify allowed origins
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
+  // methods: ["GET", "POST", "PUT", "DELETE"],
+  // allowedHeaders: ["Content-Type", "Authorization"],
+  // credentials: true,
 });
 
 server.register(import("@fastify/multipart"));
