@@ -51,7 +51,7 @@ export default async (fastify) => {
   fastify.post(
     "/",
     {
-      // preValidation: [fastify.checkSessionMiddleware],
+      preValidation: [fastify.checkSessionMiddleware],
       schema,
     },
     createEventService
@@ -73,7 +73,7 @@ export default async (fastify) => {
   );
   fastify.get(
     "/search",
-    { preValidation: [fastify.checkSessionMiddleware] },
+    // { preValidation: [fastify.checkSessionMiddleware] },
     searchEventService
   );
 
