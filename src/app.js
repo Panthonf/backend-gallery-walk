@@ -20,7 +20,7 @@ server.register(secureSession, {
     sameSite: "lax",
   },
   saveUninitialized: false,
-  resave: false,
+  resave: true,
   cookieName: "Set-Cookie",
 });
 
