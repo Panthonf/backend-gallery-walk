@@ -10,7 +10,7 @@ import * as Minio from "minio";
 // });
 
 const minioClient = new Minio.Client({
-  endPoint: process.env.MINIO_ENDPOINT || "localhost",
+  endPoint: process.env.MINIO_ENDPOINT,
   port: parseInt(process.env.MINIO_PORT),
   useSSL: process.env.MINIO_USESSL === "true",
   accessKey: process.env.MINIO_ACCESSKEY,
