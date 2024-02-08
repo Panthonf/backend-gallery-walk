@@ -17,6 +17,8 @@ server.get("/isLoggedIn", async (request, reply) => {
   }
 });
 
+
+
 const start = async () => {
   try {
     await server.listen({
