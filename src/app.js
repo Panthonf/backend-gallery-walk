@@ -35,29 +35,29 @@ server.register(secureSession, {
   cookieName: "Set-Cookie", // This should be the name of the cookie header
 });
 
-await server.register(import("@fastify/swagger"));
-await server.register(import("@fastify/swagger-ui"), {
-  routePrefix: "/docs",
-  uiConfig: {
-    docExpansion: "full",
-    deepLinking: false,
-  },
-  uiHooks: {
-    onRequest: function (request, reply, next) {
-      next();
-    },
-    preHandler: function (request, reply, next) {
-      next();
-    },
-  },
-  staticCSP: true,
-  transformStaticCSP: (header) => header,
-  transformSpecification: (swaggerObject, request, reply) => {
-    return swaggerObject;
-  },
-  transformSpecificationClone: true,
-  exposeRoute: true,
-});
+// await server.register(import("@fastify/swagger"));
+// await server.register(import("@fastify/swagger-ui"), {
+//   routePrefix: "/docs",
+//   uiConfig: {
+//     docExpansion: "full",
+//     deepLinking: false,
+//   },
+//   uiHooks: {
+//     onRequest: function (request, reply, next) {
+//       next();
+//     },
+//     preHandler: function (request, reply, next) {
+//       next();
+//     },
+//   },
+//   staticCSP: true,
+//   transformStaticCSP: (header) => header,
+//   transformSpecification: (swaggerObject, request, reply) => {
+//     return swaggerObject;
+//   },
+//   transformSpecificationClone: true,
+//   exposeRoute: true,
+// });
 
 // Include your routes
 server.register(import("./features/users/routes.js"), { prefix: "/users" });
