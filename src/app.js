@@ -29,7 +29,7 @@ server.register(secureSession, {
 
 server.register(import("@fastify/multipart"));
 
-server.register(import("@fastify/cookie"));
+// server.register(import("@fastify/cookie"));
 server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 server.decorate("isGuestLoggedIn", isGuestLoggedIn);
