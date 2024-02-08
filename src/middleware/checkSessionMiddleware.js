@@ -1,6 +1,6 @@
 // Middleware to check session cookie and set session data in request object
 const checkSessionMiddleware = async (request, reply) => {
-  const sessionData = request.session.get("user");
+  const sessionData = await request.session.get("user");
 
   // Check if the session data exists
   if (!sessionData) {
