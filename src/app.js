@@ -9,9 +9,22 @@ const server = Fastify({ logger: true });
 
 server.register(import('@fastify/cors'), {
   origin: ["https://frontend-gallery-walk.vercel.app", "http://localhost:3000"], // Specify allowed origins
-  // methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   // allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
+});
+const secureSession = import("@fastify/secure-session");
+server.register(secureSession, {
+  secret: process.env.SECRET_KEY,
+  cookie: {
+    path: "/",
+    httpOnly: true,
+    secure: true, // Change to true if using HTTPS
+    sameSite: "lax",
+    cookieName: "Set-Cookie",
+  },
+  saveUninitialized: false,
+  resave: false,
 });
 
 server.register(import("@fastify/multipart"));
@@ -21,19 +34,6 @@ server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 server.decorate("isGuestLoggedIn", isGuestLoggedIn);
 
-const secureSession = import("@fastify/secure-session");
-server.register(secureSession, {
-  secret: process.env.SECRET_KEY,
-  cookie: {
-    path: "/",
-    httpOnly: true,
-    secure: true, // Change to true if using HTTPS
-    sameSite: "lax",
-  },
-  saveUninitialized: false,
-  resave: false,
-  cookieName: "Set-Cookie", // This should be the name of the cookie header
-});
 
 await server.register(import("@fastify/swagger"));
 await server.register(import("@fastify/swagger-ui"), {
