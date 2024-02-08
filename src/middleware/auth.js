@@ -249,13 +249,4 @@ export default async (fastify) => {
       });
     }
   });
-
-  fastify.get("/isLoggedIn", async (request, reply) => {
-    const user = await request.session.get("user");
-    if (user) {
-      reply.send({ authenticated: true, user });
-    } else {
-      reply.send({ authenticated: false, user: null });
-    }
-  });
 };
