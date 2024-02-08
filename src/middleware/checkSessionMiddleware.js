@@ -6,7 +6,7 @@ const checkSessionMiddleware = async (request, reply) => {
   if (!sessionData) {
     return reply
       .status(401)
-      .send({ error: "Unauthorized: Session data not present", data: sessionData || "lll" });
+      .send({ error: "Unauthorized: Session data not present", data: sessionData });
   }
 
   // Set the session data in the request object for later use in route handlers
