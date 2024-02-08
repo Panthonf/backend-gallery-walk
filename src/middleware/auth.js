@@ -249,7 +249,7 @@ export default async (fastify) => {
   });
 
   fastify.get("/isLoggedIn", async (request, reply) => {
-    const user = await request.session.get("user");
+    const user = request.session.get("user");
     if (user) {
       reply.send({ authenticated: true, user });
     } else {
