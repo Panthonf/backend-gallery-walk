@@ -15,16 +15,13 @@ server.register(import("@fastify/cors"), {
 
 server.register(fastifyCookie);
 
-server.register(
-  (fastifySecureSession,
-  {
-    secret: process.env.SECRET,
-    cookie: { secure: true },
-    saveUninitialized: true,
-    cookieName: "sessionId",
-    expires: 1800000,
-  })
-);
+server.register(fastifySecureSession, {
+  secret: process.env.SECRET,
+  cookie: { secure: true },
+  saveUninitialized: true,
+  cookieName: "sessionId",
+  expires: 1800000,
+});
 
 server.register(import("@fastify/multipart"));
 server.decorate("isLoggedIn", isLoggedIn);
