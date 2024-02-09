@@ -4,7 +4,7 @@ import { isLoggedIn } from "./middleware/isLoggedIn.js";
 import { isGuestLoggedIn } from "./middleware/isGuestLoggedIn.js";
 import { checkSessionMiddleware } from "./middleware/checkSessionMiddleware.js";
 import fastifyCookie from "@fastify/cookie";
-import fastifySecureSession from "@fastify/secure-session";
+import fastifySecureSession from "@fastify/session";
 dotenv.config();
 const server = Fastify({ logger: true });
 server.register(import("@fastify/cors"), {
@@ -14,28 +14,17 @@ server.register(import("@fastify/cors"), {
 });
 
 server.register(fastifyCookie);
-server.register((fastifySecureSession), {
-  secret: process.env.SECRET_KEY,
-  cookieName: "Set-Cookie",
-  cookie: {
-    path: "/",
-    httpOnly: true,
-    secure: true, // Change to true if using HTTPS
-    sameSite: "lax",
-  },
-  saveUninitialized: false,
-  resave: true,
-});
 
-server.addHook("preHandler", async (request, reply) => {
-  try {
-    await request.session.get("user");
-  } catch (err) {
-    reply
-      .code(401)
-      .send({ message: "Unauthorized", success: false, data: null });
-  }
-});
+server.register(
+  (fastifySecureSession,
+  {
+    secret: process.env.SECRET,
+    cookie: { secure: true },
+    saveUninitialized: true,
+    cookieName: "sessionId",
+    expires: 1800000,
+  })
+);
 
 server.register(import("@fastify/multipart"));
 server.decorate("isLoggedIn", isLoggedIn);
