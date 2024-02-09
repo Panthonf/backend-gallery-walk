@@ -16,7 +16,7 @@ server.register(import("@fastify/cors"), {
 server.register(fastifyCookie);
 
 server.register(fastifySecureSession, {
-  secret: process.env.SECRET,
+  secret: 'a secret with minimum length of 32 characters',
   cookie: { secure: true },
   saveUninitialized: true,
   cookieName: "sessionId",
