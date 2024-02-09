@@ -6,7 +6,7 @@ import { checkSessionMiddleware } from "./middleware/checkSessionMiddleware.js";
 dotenv.config();
 const server = Fastify({ logger: true });
 server.register(import("@fastify/cors"), {
-  origin: ["https://frontend-gallery-walk.vercel.app"], // Specify allowed origins
+  origin: ["https://frontend-gallery-walk.vercel.app", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 });
@@ -14,16 +14,15 @@ server.register(import("@fastify/cors"), {
 const secureSession = import("@fastify/secure-session");
 server.register(secureSession, {
   secret: process.env.SECRET_KEY,
-  sessionName: "sessionId",
   cookieName: "Set-Cookie",
   cookie: {
     path: "/",
-    // httpOnly: true,
-    // secure: true, // Change to true if using HTTPS
-    // sameSite: "lax",
+    httpOnly: true,
+    secure: true, // Change to true if using HTTPS
+    sameSite: "lax",
   },
-  // saveUninitialized: false,
-  // resave: true,
+  saveUninitialized: false,
+  resave: true,
 });
 
 server.register(import("@fastify/multipart"));
