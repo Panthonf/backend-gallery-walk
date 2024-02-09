@@ -10,19 +10,6 @@ server.register(import("@fastify/cors"), {
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 });
-const secureSession = import("@fastify/secure-session");
-server.register(secureSession, {
-  secret: process.env.SECRET_KEY,
-  cookie: {
-    path: "/",
-    httpOnly: true,
-    secure: true, // Change to true if using HTTPS
-    sameSite: "lax",
-  },
-  saveUninitialized: false,
-  resave: true,
-  cookieName: "Set-Cookie",
-});
 
 server.register(import("@fastify/multipart"));
 // server.register(import("@fastify/cookie"));
@@ -43,5 +30,19 @@ server.register(import("./features/presenters/routes.js"), {
 });
 
 server.register(import("./middleware/auth.js"));
+
+const secureSession = import("@fastify/secure-session");
+server.register(secureSession, {
+  secret: process.env.SECRET_KEY,
+  cookie: {
+    path: "/",
+    httpOnly: true,
+    secure: true, // Change to true if using HTTPS
+    sameSite: "lax",
+  },
+  saveUninitialized: false,
+  resave: true,
+  cookieName: "Set-Cookie",
+});
 
 export default server;
