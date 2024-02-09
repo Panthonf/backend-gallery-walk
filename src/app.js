@@ -6,7 +6,7 @@ import { checkSessionMiddleware } from "./middleware/checkSessionMiddleware.js";
 dotenv.config();
 const server = Fastify({ logger: true });
 server.register(import("@fastify/cors"), {
-  origin: ["https://frontend-gallery-walk.vercel.app", "http://localhost:3000"], // Specify allowed origins
+  origin: ["https://frontend-gallery-walk.vercel.app", "https://frontend-gallery-walk.vercel.app/dashboard"], // Specify allowed origins
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 });
