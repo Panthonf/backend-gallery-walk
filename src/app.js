@@ -14,14 +14,16 @@ server.register(import("@fastify/cors"), {
 const secureSession = import("@fastify/secure-session");
 server.register(secureSession, {
   secret: process.env.SECRET_KEY,
-  cookie: {
-    httpOnly: true,
-    secure: true, // Change to true if using HTTPS
-    sameSite: "lax",
-  },
-  saveUninitialized: false,
-  resave: true,
+  sessionName: "sessionId",
   cookieName: "Set-Cookie",
+  cookie: {
+    path: "/",
+    // httpOnly: true,
+    // secure: true, // Change to true if using HTTPS
+    // sameSite: "lax",
+  },
+  // saveUninitialized: false,
+  // resave: true,
 });
 
 server.register(import("@fastify/multipart"));
