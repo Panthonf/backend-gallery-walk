@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import { isLoggedIn } from "./middleware/isLoggedIn.js";
 import { isGuestLoggedIn } from "./middleware/isGuestLoggedIn.js";
 import { checkSessionMiddleware } from "./middleware/checkSessionMiddleware.js";
+import fastifyCookie from "@fastify/cookie";
+import fastifySecureSession from "@fastify/secure-session";
 dotenv.config();
 const server = Fastify({ logger: true });
 server.register(import("@fastify/cors"), {
@@ -11,8 +13,8 @@ server.register(import("@fastify/cors"), {
   credentials: true,
 });
 
-server.register(import("@fastify/cookie"));
-server.register(import("@fastify/secure-session"), {
+server.register(fastifyCookie);
+server.register((fastifySecureSession), {
   secret: process.env.SECRET_KEY,
   cookieName: "Set-Cookie",
   cookie: {
@@ -23,6 +25,16 @@ server.register(import("@fastify/secure-session"), {
   },
   saveUninitialized: false,
   resave: true,
+});
+
+server.addHook("preHandler", async (request, reply) => {
+  try {
+    await request.session.get("user");
+  } catch (err) {
+    reply
+      .code(401)
+      .send({ message: "Unauthorized", success: false, data: null });
+  }
 });
 
 server.register(import("@fastify/multipart"));
