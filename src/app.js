@@ -11,8 +11,8 @@ server.register(import("@fastify/cors"), {
   credentials: true,
 });
 
-const secureSession = import("@fastify/secure-session");
-server.register(secureSession, {
+server.register(import("@fastify/cookie"));
+server.register(import("@fastify/secure-session"), {
   secret: process.env.SECRET_KEY,
   cookieName: "Set-Cookie",
   cookie: {
@@ -26,7 +26,6 @@ server.register(secureSession, {
 });
 
 server.register(import("@fastify/multipart"));
-// server.register(import("@fastify/cookie"));
 server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 server.decorate("isGuestLoggedIn", isGuestLoggedIn);
