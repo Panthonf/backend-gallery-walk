@@ -9,11 +9,15 @@ server.get("/", async (req, res) => {
 });
 
 server.get("/isLoggedIn", async (request, reply) => {
-  const user = await request.session.get("user");
-  if (user) {
-    reply.send({ authenticated: true, user });
-  } else {
-    reply.send({ authenticated: false, user: null });
+  try {
+    const loggedInUser = await request.session.get("user");
+    if (loggedInUser) {
+      reply.send({ authenticated: true, user: loggedInUser });
+    } else {
+      reply.send({ authenticated: false, user: null });
+    }
+  } catch (error) {
+    reply.code(500).send({ error: "Internal Server Error" });
   }
 });
 
