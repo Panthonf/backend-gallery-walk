@@ -44,7 +44,10 @@
 # CMD ["npm", "run", "dev"]
 
 # Use a Node.js image from Docker Hub
-FROM node:16-alpine AS production
+FROM node:16-alpine AS base
+
+# Install Prisma CLI
+RUN npm install -g prisma
 
 # Set working directory
 WORKDIR /app
@@ -55,14 +58,17 @@ COPY package*.json ./
 # Install production dependencies
 RUN npm ci --only=production
 
-# Copy the entire source code
+# Copy Prisma schema and source code
+COPY prisma ./prisma
 COPY . .
+
+# Generate Prisma Client
+RUN prisma generate
 
 # Expose port
 EXPOSE 8080
 
 # Start command
 CMD ["node", "src/server.js"]
-
 
 

@@ -1,12 +1,12 @@
 version: "3.8"
 
 services:
-  fastify-prisma-app:
+  fastify-api:
     build:
       context: .
       dockerfile: Dockerfile
-    image: fastify-prisma-app:latest
-    container_name: fastify-prisma-app
+    image: fastify-api:latest
+    container_name: fastify-api
     ports:
       - "8080:8080"
     environment:
