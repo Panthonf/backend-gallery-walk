@@ -130,8 +130,8 @@ dist
 .pnp.*
 
 # docker-compose
-docker-compose.yml
-Dockerfile
+# docker-compose.yml
+# Dockerfile
 .vercel
 
 
