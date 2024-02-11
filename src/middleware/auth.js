@@ -70,9 +70,9 @@ export default async (fastify) => {
         const eventId = await request.session.get("eventId");
         reply.redirect(`${process.env.FRONTEND_URL}/event/${eventId}`);
       }
-      reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+      reply.redirect(process.env.FRONTEND_URL + "dashboard");
     } else {
-      reply.redirect(process.env.FRONTEND_URL + "/login");
+      reply.redirect(process.env.FRONTEND_URL + "login");
     }
   });
 
