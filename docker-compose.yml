@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  fastify-prisma-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fastify-prisma-app:latest
+    container_name: fastify-prisma-app
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:3E6C1-16aE-3Bbab-FacDBa-b*fG2bBB@monorail.proxy.rlwy.net:28807/railway
+      - PORT=8080
+      - CALLBACK_URI=http://localhost:8080/login/google/callback
+      - CALLBACK_URI_FACEBOOK=http://localhost:8080/login/facebook/callback
+      - SECRET_KEY=fiaopfjiapfjiodamijioiofanninfdafsgwtrsgyrwtgrmioqtjip9erwtirwijijij
+      - FRONTEND_URL=https://gwalk.cpe.eng.cmu.ac.th/
+      - MINIO_ENDPOINT=minio-server-y3ut.onrender.com
+      - MINIO_URL=https://minio-server-y3ut.onrender.com
+      - MINIO_ACCESSKEY=HMCsik4bXKQ9Errj7Lut
+      - MINIO_SECRETKEY=C043wmQMy4NxSa1VifZk6oUiuYDrTmVgzHxvQ49X
+      - MINIO_PORT=443
+      - MINIO_USESSL=true
+      - CALLBACK_URI_GUEST=http://localhost:8080/guests/login/google/callback
+    restart: always
+
+
+#   postgres:
+#     image: postgres:latest
+#     container_name: postgres-db
+#     environment:
+#       - POSTGRES_DB=gallery-walk
+#       - POSTGRES_USER=myuser
+#       - POSTGRES_PASSWORD=mypassword
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+#   adminer:
+#     image: adminer
+#     restart: always
+#     ports:
+#       - 8081:8080
+
+#   minio:
+#     image: minio/minio:latest
+#     ports:
+#       - "7000:9000"
+#       - "7001:9001"
+#     environment:
+#       MINIO_ROOT_USER: minioadmin
+#       MINIO_ROOT_PASSWORD: miniopassword
+#     volumes:
+#       - ./volume:/data
+#     command: server --address ":9001" --console-address ":9000" /data
+#     restart: always
+
+# networks:
+#   default:
+#     driver: bridge
+
+# volumes:
+#   postgres_data:
