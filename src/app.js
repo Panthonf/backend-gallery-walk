@@ -28,16 +28,15 @@ server.decorate("isLoggedIn", isLoggedIn);
 server.decorate("checkSessionMiddleware", checkSessionMiddleware);
 server.decorate("isGuestLoggedIn", isGuestLoggedIn);
 
-// Include your routes
-server.register(import("./features/users/routes.js"), { prefix: "/users" });
-server.register(import("./features/events/routes.js"), { prefix: "/events" });
+// Include your routes with the /api prefix
+server.register(import("./features/users/routes.js"), { prefix: "/api/users" });
+server.register(import("./features/events/routes.js"), { prefix: "/api/events" });
 server.register(import("./features/projects/routes.js"), {
-  prefix: "/projects",
+  prefix: "/api/projects",
 });
-server.register(import("./features/guests/routes.js"), { prefix: "/guests" });
-// fastify.register(require('./routes/productRoutes'));
+server.register(import("./features/guests/routes.js"), { prefix: "/api/guests" });
 server.register(import("./features/presenters/routes.js"), {
-  prefix: "/presenters",
+  prefix: "/api/presenters",
 });
 server.register(import("./middleware/auth.js"));
 
