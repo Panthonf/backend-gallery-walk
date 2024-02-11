@@ -18,11 +18,11 @@ export default async (fastify) => {
       },
       auth: oauthPlugin.GOOGLE_CONFIGURATION,
     },
-    startRedirectPath: "/login/google",
+    startRedirectPath: "/api/login/google",
     callbackUri: CALLBACK_URI,
   });
 
-  fastify.get("/login/google/callback", async function (request, reply, done) {
+  fastify.get("/api/login/google/callback", async function (request, reply, done) {
     const { token } =
       await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
 
@@ -58,9 +58,9 @@ export default async (fastify) => {
           const eventId = await request.session.get("eventId");
           reply.redirect(`${process.env.FRONTEND_URL}/event/${eventId}`);
         }
-        reply.redirect(process.env.FRONTEND_URL + "/dashboard");
+        reply.redirect(process.env.FRONTEND_URL + "dashboard");
       } else {
-        reply.redirect(process.env.FRONTEND_URL + "/login");
+        reply.redirect(process.env.FRONTEND_URL + "login");
       }
     }
 

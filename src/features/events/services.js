@@ -112,7 +112,7 @@ async function uploadThumbnailService(request, reply, done) {
         const thumbnailData = {
           event_id: eventId,
           thumbnail: thumbnailName,
-          thumbnail_url: `${process.env.MINIO_ENDPOINT}/event-bucket/${thumbnailName}`,
+          thumbnail_url: `${process.env.MINIO_URL}/event-bucket/${thumbnailName}`,
         };
 
         const thumbnailUploaded = await uploadThumbnail(thumbnailData);

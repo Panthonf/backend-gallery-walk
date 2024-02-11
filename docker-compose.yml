@@ -16,7 +16,7 @@ services:
       - CALLBACK_URI=https://gwalk.cpe.eng.cmu.ac.th/api/login/google/callback
       - CALLBACK_URI_FACEBOOK=https://gwalk.cpe.eng.cmu.ac.th/api/login/facebook/callback
       - SECRET_KEY=fiaopfjiapfjiodamijioiofanninfdafsgwtrsgyrwtgrmioqtjip9erwtirwijijij
-      - FRONTEND_URL=https://gwalk.cpe.eng.cmu.ac.th/
+      - FRONTEND_URL=https://gwalk.cpe.eng.cmu.ac.th
       - MINIO_ENDPOINT=minio-server-y3ut.onrender.com
       - MINIO_URL=https://minio-server-y3ut.onrender.com
       - MINIO_ACCESSKEY=HMCsik4bXKQ9Errj7Lut

@@ -24,7 +24,7 @@ const oauthConfig = {
     },
     auth: oauthPlugin.GOOGLE_CONFIGURATION,
   },
-  startRedirectPath: "/login/google",
+  startRedirectPath: "/api/login/google",
   callbackUri: process.env.CALLBACK_URI_GUEST,
 };
 
