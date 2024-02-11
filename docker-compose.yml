@@ -13,8 +13,8 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://postgres:3E6C1-16aE-3Bbab-FacDBa-b*fG2bBB@monorail.proxy.rlwy.net:28807/railway
       - PORT=8080
-      - CALLBACK_URI=http://localhost:8080/login/google/callback
-      - CALLBACK_URI_FACEBOOK=http://localhost:8080/login/facebook/callback
+      - CALLBACK_URI=https://gwalk.cpe.eng.cmu.ac.th/api/login/google/callback
+      - CALLBACK_URI_FACEBOOK=https://gwalk.cpe.eng.cmu.ac.th/api/login/facebook/callback
       - SECRET_KEY=fiaopfjiapfjiodamijioiofanninfdafsgwtrsgyrwtgrmioqtjip9erwtirwijijij
       - FRONTEND_URL=https://gwalk.cpe.eng.cmu.ac.th/
       - MINIO_ENDPOINT=minio-server-y3ut.onrender.com
@@ -23,7 +23,7 @@ services:
       - MINIO_SECRETKEY=C043wmQMy4NxSa1VifZk6oUiuYDrTmVgzHxvQ49X
       - MINIO_PORT=443
       - MINIO_USESSL=true
-      - CALLBACK_URI_GUEST=http://localhost:8080/guests/login/google/callback
+      - CALLBACK_URI_GUEST=https://gwalk.cpe.eng.cmu.ac.th/api/guests/login/google/callback
     restart: always
 
 
