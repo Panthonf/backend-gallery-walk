@@ -2,13 +2,13 @@ import server from "./app.js";
 
 const PORT = process.env.PORT || 3000;
 
-server.get("/", async (req, res) => {
+server.get("/api/", async (req, res) => {
   return {
     Welcome: "Welcome to the Fastify API",
   };
 });
 
-server.get("/isLoggedIn", async (request, reply) => {
+server.get("/api/isLoggedIn", async (request, reply) => {
   try {
     const loggedInUser = await request.session.get("user");
     if (loggedInUser) {
