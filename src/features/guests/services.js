@@ -233,6 +233,7 @@ async function giveVirtualMoneyService(req, rep, done) {
   const virtualMoney = req.body.amount;
   const guestId = parseInt(req.query.guestId);
   const projectId = parseInt(req.query.projectId);
+  const eventId = parseInt(req.query.eventId);
 
   if (!virtualMoney) {
     rep.send({
@@ -259,7 +260,8 @@ async function giveVirtualMoneyService(req, rep, done) {
   } else {
     const newVirtualMoney = await addProjectVirtualMoney(
       virtualMoney,
-      projectId
+      projectId,
+      eventId
     );
 
     if (!newVirtualMoney) {
