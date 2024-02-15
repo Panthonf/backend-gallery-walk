@@ -11,6 +11,7 @@ import {
   getTotalProjectsByEventId,
   updateEvent,
   deleteThumbnail,
+  getEventTotalVirtualMoney,
 } from "./models.js";
 
 async function createEventService(req, reply, done) {
@@ -152,7 +153,7 @@ async function uploadThumbnailService(request, reply, done) {
     const thumbnailData = {
       event_id: eventId,
       thumbnail: thumbnailName,
-      thumbnail_url: `${process.env.MINIO_ENDPOINT}/event-bucket/${thumbnailName}`,
+      thumbnail_url: `${process.env.MINIO_URL}/event-bucket/${thumbnailName}`,
     };
 
     const thumbnailUploaded = await uploadThumbnail(thumbnailData);
@@ -392,6 +393,27 @@ const updateEventService = async (request, reply, done) => {
   }
 };
 
+async function getEventFeedbackService(request, reply, done) {
+  const eventId = parseInt(request.params.eventId);
+  try {
+    const totalVirtualMoney = await getEventTotalVirtualMoney(eventId);
+    reply.send({
+      success: true,
+      message: "Event Feedback fetched successfully",
+      data: {
+        total_virtual_money: totalVirtualMoney,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+}
+
 export {
   createEventService,
   deleteEventService,
@@ -403,4 +425,5 @@ export {
   getEventManagerInfoService,
   checkEventRoleService,
   updateEventService,
+  getEventFeedbackService,
 };
