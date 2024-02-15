@@ -34,9 +34,9 @@ export default async (fastify) => {
 
   fastify.post("/virtual-money/:total", addVirtualMoneyService);
 
-  fastify.get("/events", async (req, rep) => {
+  fastify.get("/access/event/:eventId", async (req, rep) => {
     try {
-      const { eventId } = req.query;
+      const eventId = parseInt(req.params.eventId);
 
       if (!eventId) {
         rep.send({
