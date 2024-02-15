@@ -73,7 +73,7 @@ async function getProjectByUserIdService(req, reply) {
       const eventData = await getEventByEventId(project.event_id);
       return { ...project, virtual_money: virtualMoney, event_data: eventData };
     });
-
+    
     if (projects.length === 0) {
       reply.send({
         success: false,
