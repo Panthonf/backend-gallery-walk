@@ -26,4 +26,13 @@ export default async (fastify) => {
       });
     }
   });
+
+  fastify.get("/logout", async (request, reply) => {
+    request.session.set("user", null);
+    reply.send({
+      success: true,
+      message: "User logged out successfully",
+      data: null,
+    });
+  });
 };
