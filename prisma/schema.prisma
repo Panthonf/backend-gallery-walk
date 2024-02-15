@@ -80,6 +80,7 @@ model virtual_moneys {
   id         Int       @id @default(autoincrement())
   amount     Int?
   project_id Int
+  event_id   Int
   created_at DateTime? @default(now()) @db.Timestamp(6)
   updated_at DateTime? @db.Timestamp(6)
 }
