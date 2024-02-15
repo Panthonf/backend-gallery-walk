@@ -9,6 +9,7 @@ import {
   getEventManagerInfoService,
   checkEventRoleService,
   updateEventService,
+  getEventFeedbackService
 } from "./services.js";
 
 const schema = {
@@ -87,4 +88,5 @@ export default async (fastify) => {
 
   fastify.get("/role/:eventId", checkEventRoleService);
 
+  fastify.get("/event-feedback/:eventId", getEventFeedbackService);
 };
