@@ -335,6 +335,7 @@ async function addProjectCommentService(req, rep, done) {
 
 async function getProjectCommentsService(req, rep, done) {
   const { projectId } = req.query;
+  const { page, pageSize } = req.query;
 
   if (!projectId) {
     rep.send({
@@ -345,7 +346,13 @@ async function getProjectCommentsService(req, rep, done) {
   }
 
   const projectComments = await getProjectComments(parseInt(projectId));
-  if (!projectComments) {
+
+  const start = (page - 1) * pageSize;
+  const end = page * pageSize;
+
+  const paginatedEvents = projectComments.slice(start, end);
+
+  if (paginatedEvents.length === 0) {
     rep.send({
       success: false,
       message: "Cannot get project comments",
@@ -356,7 +363,8 @@ async function getProjectCommentsService(req, rep, done) {
   rep.send({
     success: true,
     message: "Project comments fetched successfully",
-    data: projectComments,
+    data: paginatedEvents,
+    totalComments: projectComments.length,
   });
 }
 
