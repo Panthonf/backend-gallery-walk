@@ -8,7 +8,7 @@ import fastifySecureSession from "@fastify/session";
 dotenv.config();
 const server = Fastify({ logger: true });
 server.register(import("@fastify/cors"), {
-  origin: ["https://frontend-gallery-walk.vercel.app", "http://localhost:5173"],
+  origin: ["http://localhost:3000", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 });
@@ -16,8 +16,9 @@ server.register(import("@fastify/cors"), {
 server.register(fastifyCookie);
 
 server.register(fastifySecureSession, {
-  secret: 'a secret with minimum length of 32 characters',
-  cookie: { secure: true },
+  secret: "a secret with minimum length of 32 characters",
+  // change to true for production
+  cookie: { secure: false },
   saveUninitialized: true,
   cookieName: "sessionId",
   expires: 1800000,
@@ -30,11 +31,15 @@ server.decorate("isGuestLoggedIn", isGuestLoggedIn);
 
 // Include your routes with the /api prefix
 server.register(import("./features/users/routes.js"), { prefix: "/api/users" });
-server.register(import("./features/events/routes.js"), { prefix: "/api/events" });
+server.register(import("./features/events/routes.js"), {
+  prefix: "/api/events",
+});
 server.register(import("./features/projects/routes.js"), {
   prefix: "/api/projects",
 });
-server.register(import("./features/guests/routes.js"), { prefix: "/api/guests" });
+server.register(import("./features/guests/routes.js"), {
+  prefix: "/api/guests",
+});
 server.register(import("./features/presenters/routes.js"), {
   prefix: "/api/presenters",
 });
