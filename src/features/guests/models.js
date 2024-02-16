@@ -109,11 +109,12 @@ const saveVirtualMoney = async (guestId, eventId) => {
   return guest;
 };
 
-async function addProjectVirtualMoney(virtualMoney, projectId) {
+async function addProjectVirtualMoney(virtualMoney, projectId, eventId) {
   try {
     const existingProject = await prisma.virtual_moneys.findFirst({
       where: {
         project_id: projectId,
+        event_id: eventId,
       },
       select: {
         amount: true,
@@ -126,6 +127,7 @@ async function addProjectVirtualMoney(virtualMoney, projectId) {
         data: {
           project_id: projectId,
           amount: virtualMoney,
+          event_id: eventId,
         },
         select: {
           amount: true,
@@ -138,6 +140,7 @@ async function addProjectVirtualMoney(virtualMoney, projectId) {
       const updatedVirtualMoney = await prisma.virtual_moneys.update({
         where: {
           id: existingProject.id,
+          event_id: eventId,
         },
         data: {
           amount: newAmount,
@@ -145,6 +148,7 @@ async function addProjectVirtualMoney(virtualMoney, projectId) {
         select: {
           amount: true,
           project_id: true,
+          event_id: true,
         },
       });
       return updatedVirtualMoney.amount;
