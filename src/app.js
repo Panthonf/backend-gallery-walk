@@ -8,7 +8,7 @@ import fastifySecureSession from "@fastify/session";
 dotenv.config();
 const server = Fastify({ logger: true });
 server.register(import("@fastify/cors"), {
-  origin: ["https://frontend-gallery-walk.vercel.app", "http://localhost:5173"],
+  origin: ["https://gwalk.cpe.eng.cmu.ac.th", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 });
