@@ -50,7 +50,9 @@ export default async (fastify) => {
       const guestId = await req.session.get("guest");
       if (!guestId) {
         req.session.set("eventId", eventId);
-        rep.redirect(`${process.env.FRONTEND_URL}/guest/login`);
+        rep.redirect(
+          `${process.env.FRONTEND_URL}/guest/login?eventId=${eventId}`
+        );
       }
 
       // Check if guest is logged in to the same event
@@ -82,6 +84,7 @@ export default async (fastify) => {
       const guestIdQuery = req.query.guestId;
       const eventIdSession = await req.session.get("eventId");
       const { eventId } = req.query;
+      await req.session.set("eventId", eventId);
       if (parseInt(eventId) !== parseInt(eventIdSession)) {
         rep.send({
           message: "Event session not found",
