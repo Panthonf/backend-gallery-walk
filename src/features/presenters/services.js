@@ -6,7 +6,7 @@ import {
 } from "./models.js";
 async function createProjectService(req, rep) {
   try {
-    const userId = 1;
+    const userId = req.session.get("user");
     const projectData = req.body;
     const eventId = parseInt(req.params.eventId);
 
