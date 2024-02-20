@@ -78,7 +78,7 @@ async function getProjectByUserIdService(req, reply) {
       reply.send({
         success: false,
         message: "get projects failed",
-        data: null,
+        data: userId,
       });
     }
     reply.send({
