@@ -16,12 +16,11 @@ server.register(import("@fastify/cors"), {
 server.register(fastifyCookie);
 
 server.register(fastifySecureSession, {
-  secret: "a secret with minimum length of 32 characters",
-  // change to true for production
+  secret: 'a secret with minimum length of 32 characters',
   cookie: { secure: false },
   saveUninitialized: true,
   cookieName: "sessionId",
-  expires: 1800000,
+  expires: 6000000,
 });
 
 server.register(import("@fastify/multipart"));
