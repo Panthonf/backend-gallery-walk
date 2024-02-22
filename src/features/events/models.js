@@ -194,6 +194,15 @@ const getEventTotalVirtualMoney = async (eventId) => {
   return totalProjects._sum ? totalProjects._sum.amount : 0;
 };
 
+const getEventProjects = async (eventId) => {
+  const projects = await prisma.projects.findMany({
+    where: {
+      event_id: eventId,
+    },
+  });
+  return projects;
+};
+
 export {
   createEvent,
   deleteEvent,
@@ -207,4 +216,5 @@ export {
   updateEvent,
   deleteThumbnail,
   getEventTotalVirtualMoney,
+  getEventProjects,
 };
