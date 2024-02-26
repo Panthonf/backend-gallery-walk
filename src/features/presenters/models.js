@@ -69,9 +69,33 @@ async function getProjectVirtualMoney(projectId) {
   }
 }
 
+const uploadProjectImage = async (imageProjectData) => {
+  const project = await prisma.project_images.create({
+    data: {
+      project_id: imageProjectData.project_id,
+      project_image: imageProjectData.project_image,
+      project_image_url: imageProjectData.project_image_url,
+      created_at: imageProjectData.created_at,
+      updated_at: imageProjectData.updated_at,
+    },
+  });
+  return project;
+};
+
+const getProjectImages = async (projectId) => {
+  const projectImages = await prisma.project_images.findMany({
+    where: {
+      project_id: projectId,
+    },
+  });
+  return projectImages;
+};
+
 export {
   createProject,
   getProjectByEventId,
   getUserIdByEventId,
   getProjectVirtualMoney,
+  uploadProjectImage,
+  getProjectImages,
 };
