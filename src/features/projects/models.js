@@ -154,6 +154,17 @@ async function getProjectComments(projectId) {
   return comments;
 }
 
+const deleteProjectImage = async (projectId, projectImage) => {
+  const image = await prisma.project_images.deleteMany({
+    where: {
+      project_id: projectId,
+      project_image: projectImage,
+    },
+  });
+
+  return image;
+};
+
 export {
   createProject,
   addProjectMember,
@@ -165,4 +176,5 @@ export {
   updateProjectDescription,
   getProjectVirtualMoney,
   getProjectComments,
+  deleteProjectImage,
 };
