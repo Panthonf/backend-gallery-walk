@@ -1,4 +1,6 @@
+import minioClient from "../../middleware/minio.js";
 import { getEventByEventId } from "../events/models.js";
+import { getProjectImages } from "../presenters/models.js";
 import {
   createProject,
   addProjectMember,
@@ -10,6 +12,7 @@ import {
   updateProjectDescription,
   getProjectVirtualMoney,
   getProjectComments,
+  deleteProjectImage,
 } from "./models.js";
 
 async function createProjectService(req, reply, done) {
@@ -73,7 +76,7 @@ async function getProjectByUserIdService(req, reply) {
       const eventData = await getEventByEventId(project.event_id);
       return { ...project, virtual_money: virtualMoney, event_data: eventData };
     });
-    
+
     if (projects.length === 0) {
       reply.send({
         success: false,
@@ -169,6 +172,9 @@ async function getProjectByProjectIdService(req, rep, done) {
 
   try {
     const data = await getProjectByProjectId(projectId);
+    const projectImages = await getProjectImages(projectId);
+    data.project_image = projectImages;
+
     if (data == null) {
       rep.send({
         message: "not found project",
@@ -306,6 +312,42 @@ async function getProjectCommentsService(req, rep, done) {
   }
 }
 
+const deleteProjectImageService = async (req, rep) => {
+  const projectId = parseInt(req.params.projectId);
+  const projectImage = req.params.projectImage;
+
+  try {
+    const data = await deleteProjectImage(projectId, projectImage);
+    minioClient.removeObject("project-bucket", projectImage).then((err) => {
+      if (err) {
+        rep.send({
+          success: false,
+          message: "delete project image failed",
+          data: null,
+        });
+      }
+    });
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "deleted project image successfully",
+      success: true,
+      data: data,
+    });
+  } catch (err) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+};
+
 export {
   createProjectService,
   addProjectMemberService,
@@ -317,4 +359,5 @@ export {
   updateProjectDescriptionService,
   getProjectVirtualMoneyService,
   getProjectCommentsService,
+  deleteProjectImageService,
 };
