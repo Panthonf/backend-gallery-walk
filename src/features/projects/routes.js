@@ -9,7 +9,8 @@ import {
   updateProjectService,
   updateProjectDescriptionService,
   getProjectVirtualMoneyService,
-  getProjectCommentsService
+  getProjectCommentsService,
+  deleteProjectImageService,
 } from "./services.js";
 
 export default async (fastify) => {
@@ -47,4 +48,9 @@ export default async (fastify) => {
   fastify.get("/get-virtual-money/:projectId", getProjectVirtualMoneyService);
 
   fastify.get("/get-comments/:projectId", getProjectCommentsService);
+
+  fastify.delete(
+    "/delete-project-image/:projectId/:projectImage",
+    deleteProjectImageService
+  );
 };
