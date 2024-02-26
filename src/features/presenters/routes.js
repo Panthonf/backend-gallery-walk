@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   createProjectService,
   getProjectByEventIdService,
+  uploadProjectImageService
 } from "./services.js";
 export default async (fastify) => {
   fastify.get("/:eventId", async (req, rep) => {
@@ -22,6 +23,8 @@ export default async (fastify) => {
   });
 
   fastify.post("/create-project/:eventId", createProjectService);
+
+  fastify.post("/add-project-image/:projectId", uploadProjectImageService);
 
   fastify.get("/get-project/:eventId", getProjectByEventIdService);
 };
