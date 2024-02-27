@@ -5,6 +5,7 @@ import {
   getProjectVirtualMoney,
   uploadProjectImage,
   getProjectImages,
+  getProjectDocuments,
 } from "./models.js";
 import minioClient from "../../middleware/minio.js";
 async function createProjectService(req, rep) {
@@ -93,7 +94,9 @@ async function getProjectByEventIdService(req, rep) {
 
     for (let i = 0; i < project.length; i++) {
       const projectImages = await getProjectImages(project[i].id);
+      const projectDocuments = await getProjectDocuments(project[i].id);
       project[i].project_image = projectImages;
+      project[i].project_document = projectDocuments;
     }
 
     if (userId.user_id !== userSession) {
