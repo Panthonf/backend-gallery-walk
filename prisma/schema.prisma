@@ -106,3 +106,12 @@ model project_images {
   created_at        DateTime? @default(now()) @db.Timestamp(6)
   updated_at        DateTime? @db.Timestamp(6)
 }
+
+model documents {
+  id            Int       @id @default(autoincrement())
+  project_id    Int
+  document_name String?   @db.VarChar(255) // file name
+  document_url  String?   @db.VarChar(255) // file url
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @db.Timestamp(6)
+}
