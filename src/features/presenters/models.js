@@ -91,6 +91,15 @@ const getProjectImages = async (projectId) => {
   return projectImages;
 };
 
+const getProjectDocuments = async (projectId) => {
+  const projectDocuments = await prisma.documents.findMany({
+    where: {
+      project_id: projectId,
+    },
+  });
+  return projectDocuments;
+}
+
 export {
   createProject,
   getProjectByEventId,
@@ -98,4 +107,5 @@ export {
   getProjectVirtualMoney,
   uploadProjectImage,
   getProjectImages,
+  getProjectDocuments
 };
