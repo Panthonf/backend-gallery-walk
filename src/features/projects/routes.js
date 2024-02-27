@@ -11,6 +11,7 @@ import {
   getProjectVirtualMoneyService,
   getProjectCommentsService,
   deleteProjectImageService,
+  addProjectDocumentService,
 } from "./services.js";
 
 export default async (fastify) => {
@@ -53,4 +54,6 @@ export default async (fastify) => {
     "/delete-project-image/:projectId/:projectImage",
     deleteProjectImageService
   );
+
+  fastify.post("/upload-documents/:projectId", addProjectDocumentService);
 };
