@@ -165,6 +165,20 @@ const deleteProjectImage = async (projectId, projectImage) => {
   return image;
 };
 
+const addProjectDocument = async (documentData) => {
+  const document = await prisma.documents.create({
+    data: {
+      project_id: documentData.project_id,
+      document_name: documentData.document_name,
+      document_url: documentData.document_url,
+      created_at: documentData.created_at,
+      updated_at: documentData.updated_at,
+    },
+  });
+
+  return document;
+};
+
 export {
   createProject,
   addProjectMember,
@@ -177,4 +191,5 @@ export {
   getProjectVirtualMoney,
   getProjectComments,
   deleteProjectImage,
+  addProjectDocument,
 };
