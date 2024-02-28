@@ -12,6 +12,7 @@ import {
   getProjectCommentsService,
   deleteProjectImageService,
   addProjectDocumentService,
+  deleteProjectDocumentService,
 } from "./services.js";
 
 export default async (fastify) => {
@@ -53,6 +54,11 @@ export default async (fastify) => {
   fastify.delete(
     "/delete-project-image/:projectId/:projectImage",
     deleteProjectImageService
+  );
+
+  fastify.delete(
+    "/delete-project-document/:projectId/:projectDocument",
+    deleteProjectDocumentService
   );
 
   fastify.post("/upload-documents/:projectId", addProjectDocumentService);
