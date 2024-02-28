@@ -14,6 +14,7 @@ import {
   getProjectComments,
   deleteProjectImage,
   addProjectDocument,
+  deleteProjectDocument,
 } from "./models.js";
 
 async function createProjectService(req, reply, done) {
@@ -181,6 +182,9 @@ async function getProjectByProjectIdService(req, rep, done) {
   try {
     const data = await getProjectByProjectId(projectId);
     const projectImages = await getProjectImages(projectId);
+    const projectDocuments = await getProjectDocuments(projectId);
+
+    data.project_document = projectDocuments;
     data.project_image = projectImages;
 
     if (data == null) {
@@ -404,6 +408,48 @@ const addProjectDocumentService = async (req, rep) => {
   });
 };
 
+const deleteProjectDocumentService = async (req, rep) => {
+  const projectId = parseInt(req.params.projectId);
+  const projectDocument = req.params.projectDocument;
+
+  rep.send({
+    message: "delete project document successfully",
+    projectDocument: projectDocument,
+    projectId: projectId,
+  });
+
+  try {
+    const data = await deleteProjectDocument(projectId, projectDocument);
+    minioClient.removeObject("document-bucket", projectDocument).then((err) => {
+      if (err) {
+        rep.send({
+          success: false,
+          message: "delete project document failed",
+          data: null,
+        });
+      }
+    });
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "deleted project document successfully",
+      success: true,
+      data: data,
+    });
+  } catch (err) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+};
+
 export {
   createProjectService,
   addProjectMemberService,
@@ -417,4 +463,5 @@ export {
   getProjectCommentsService,
   deleteProjectImageService,
   addProjectDocumentService,
+  deleteProjectDocumentService,
 };
