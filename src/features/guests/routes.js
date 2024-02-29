@@ -81,7 +81,7 @@ export default async (fastify) => {
   fastify.get("/check-guest-session", async (req, rep) => {
     try {
       const guestIdSession = await req.session.get("guest");
-      const guestIdQuery = req.query.guestId;
+      const guestIdQuery = await req.query.guestId;
       const eventIdSession = await req.session.get("eventId");
       const { eventId } = req.query;
       await req.session.set("eventId", eventId);
