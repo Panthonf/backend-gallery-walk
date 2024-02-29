@@ -154,6 +154,41 @@ async function getProjectComments(projectId) {
   return comments;
 }
 
+const deleteProjectImage = async (projectId, projectImage) => {
+  const image = await prisma.project_images.deleteMany({
+    where: {
+      project_id: projectId,
+      project_image: projectImage,
+    },
+  });
+
+  return image;
+};
+
+const addProjectDocument = async (documentData) => {
+  const document = await prisma.documents.create({
+    data: {
+      project_id: documentData.project_id,
+      document_name: documentData.document_name,
+      document_url: documentData.document_url,
+      created_at: documentData.created_at,
+      updated_at: documentData.updated_at,
+    },
+  });
+
+  return document;
+};
+
+const deleteProjectDocument = async (projectId, projectDocument) => {
+  const document = await prisma.documents.deleteMany({
+    where: {
+      project_id: projectId,
+      document_name: projectDocument,
+    },
+  });
+  return document;
+};
+
 export {
   createProject,
   addProjectMember,
@@ -165,4 +200,7 @@ export {
   updateProjectDescription,
   getProjectVirtualMoney,
   getProjectComments,
+  deleteProjectImage,
+  addProjectDocument,
+  deleteProjectDocument,
 };

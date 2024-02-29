@@ -41,6 +41,18 @@ minioClient.bucketExists("event-bucket", function (err, exists) {
   }
 });
 
+minioClient.bucketExists("document-bucket", function (err, exists) {
+  if (err) {
+    return console.log(err);
+  }
+  if (!exists) {
+    minioClient.makeBucket("document-bucket", "us-east-1", function (err) {
+      if (err) return console.log(err);
+      console.log(`Bucket "document-bucket" created successfully`);
+    });
+  }
+});
+
 minioClient.listBuckets(function (err, buckets) {
   if (err) return console.log(err);
   console.log("buckets :>> ", buckets);

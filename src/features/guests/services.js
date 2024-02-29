@@ -12,7 +12,6 @@ import {
   getProjectComments,
 } from "./models.js";
 import { createGuest } from "./models.js";
-import { parse } from "dotenv";
 
 const oauthConfig = {
   scope: ["profile", "email"],
@@ -31,7 +30,6 @@ const oauthConfig = {
 async function googleAuthCallbackService(request, reply, done) {
   const { token } =
     await this.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
-
   const { data } = await axios.get(
     "https://www.googleapis.com/oauth2/v3/userinfo",
 
@@ -119,7 +117,7 @@ async function guestLogin(request, reply) {
 
 async function guestLogout(request, reply) {
   try {
-    request.session.delete();
+    request.session.guest = null;
     reply.send({
       success: true,
       message: "Guest logged out successfully",
@@ -177,6 +175,7 @@ async function isLoggedInService(request, reply) {
 }
 
 async function getGuestDataService(req, rep, done) {
+  await req.session.set("eventId", req.query.eventId);
   const guestId = req.session.get("guest");
   if (req.session.get("guest")) {
     const data = await getGuestData(guestId);

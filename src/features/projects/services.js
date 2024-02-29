@@ -1,4 +1,6 @@
+import minioClient from "../../middleware/minio.js";
 import { getEventByEventId } from "../events/models.js";
+import { getProjectDocuments, getProjectImages } from "../presenters/models.js";
 import {
   createProject,
   addProjectMember,
@@ -10,6 +12,9 @@ import {
   updateProjectDescription,
   getProjectVirtualMoney,
   getProjectComments,
+  deleteProjectImage,
+  addProjectDocument,
+  deleteProjectDocument,
 } from "./models.js";
 
 async function createProjectService(req, reply, done) {
@@ -73,12 +78,12 @@ async function getProjectByUserIdService(req, reply) {
       const eventData = await getEventByEventId(project.event_id);
       return { ...project, virtual_money: virtualMoney, event_data: eventData };
     });
-    
+
     if (projects.length === 0) {
       reply.send({
         success: false,
         message: "get projects failed",
-        data: null,
+        data: userId,
       });
     }
     reply.send({
@@ -131,6 +136,13 @@ async function searchProjectService(request, reply, done) {
     const start = (page - 1) * pageSize;
     const end = page * pageSize;
 
+    for (let i = 0; i < allProjects.length; i++) {
+      const projectImages = await getProjectImages(allProjects[i].id);
+      allProjects[i].project_image = projectImages;
+      const projectDocuments = await getProjectDocuments(allProjects[i].id);
+      allProjects[i].project_document = projectDocuments;
+    }
+
     const paginatedEvents = allProjects.slice(start, end);
 
     if (paginatedEvents.length === 0) {
@@ -169,6 +181,12 @@ async function getProjectByProjectIdService(req, rep, done) {
 
   try {
     const data = await getProjectByProjectId(projectId);
+    const projectImages = await getProjectImages(projectId);
+    const projectDocuments = await getProjectDocuments(projectId);
+
+    data.project_document = projectDocuments;
+    data.project_image = projectImages;
+
     if (data == null) {
       rep.send({
         message: "not found project",
@@ -306,6 +324,132 @@ async function getProjectCommentsService(req, rep, done) {
   }
 }
 
+const deleteProjectImageService = async (req, rep) => {
+  const projectId = parseInt(req.params.projectId);
+  const projectImage = req.params.projectImage;
+
+  try {
+    const data = await deleteProjectImage(projectId, projectImage);
+    minioClient.removeObject("project-bucket", projectImage).then((err) => {
+      if (err) {
+        rep.send({
+          success: false,
+          message: "delete project image failed",
+          data: null,
+        });
+      }
+    });
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "deleted project image successfully",
+      success: true,
+      data: data,
+    });
+  } catch (err) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+};
+
+const addProjectDocumentService = async (req, rep) => {
+  const projectId = parseInt(req.params.projectId);
+  const parts = req.files();
+  const files = [];
+
+  const success = [];
+  for await (const part of parts) {
+    if (part.file) {
+      const filename = `${projectId}-${part.filename}`;
+      files.push({ filename: filename });
+      minioClient.putObject(
+        "document-bucket",
+        filename,
+        part.file,
+        function (err, etag) {
+          if (err) {
+            success.push(false);
+          }
+        }
+      );
+      const documentData = {
+        project_id: projectId,
+        document_name: filename,
+        document_url: `${process.env.MINIO_URL}/document-bucket/${filename}`,
+      };
+
+      const document = await addProjectDocument(documentData);
+      if (!document) {
+        success.push(false);
+      }
+      success.push(true);
+    }
+  }
+
+  if (success.includes(false)) {
+    rep.send({
+      success: false,
+      message: "add project document failed",
+      data: null,
+    });
+  }
+  rep.send({
+    success: true,
+    message: "add project document successfully",
+    data: files,
+  });
+};
+
+const deleteProjectDocumentService = async (req, rep) => {
+  const projectId = parseInt(req.params.projectId);
+  const projectDocument = req.params.projectDocument;
+
+  rep.send({
+    message: "delete project document successfully",
+    projectDocument: projectDocument,
+    projectId: projectId,
+  });
+
+  try {
+    const data = await deleteProjectDocument(projectId, projectDocument);
+    minioClient.removeObject("document-bucket", projectDocument).then((err) => {
+      if (err) {
+        rep.send({
+          success: false,
+          message: "delete project document failed",
+          data: null,
+        });
+      }
+    });
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "deleted project document successfully",
+      success: true,
+      data: data,
+    });
+  } catch (err) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+};
+
 export {
   createProjectService,
   addProjectMemberService,
@@ -317,4 +461,7 @@ export {
   updateProjectDescriptionService,
   getProjectVirtualMoneyService,
   getProjectCommentsService,
+  deleteProjectImageService,
+  addProjectDocumentService,
+  deleteProjectDocumentService,
 };

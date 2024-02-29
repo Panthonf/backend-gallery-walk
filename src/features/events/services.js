@@ -1,4 +1,5 @@
 import minioClient from "../../middleware/minio.js";
+import { getProjectVirtualMoney } from "../presenters/models.js";
 import {
   createEvent,
   deleteEvent,
@@ -12,6 +13,7 @@ import {
   updateEvent,
   deleteThumbnail,
   getEventTotalVirtualMoney,
+  getEventProjects,
 } from "./models.js";
 
 async function createEventService(req, reply, done) {
@@ -267,16 +269,17 @@ async function searchEventService(request, reply, done) {
     const end = page * pageSize;
 
     // Get the paginated subset from the entire dataset
-    const paginatedEvents = allEvents.slice(start, end);
 
-    const events = paginatedEvents.map(async (event) => {
+    const events = allEvents.map(async (event) => {
       return {
         ...event,
         total_projects: await getTotalProjectsByEventId(event.id),
       };
     });
 
-    if (events.length === 0) {
+    const paginatedEvents = events.slice(start, end);
+
+    if (paginatedEvents.length === 0) {
       reply.status(404).send({
         success: false,
         message: "Data not found",
@@ -286,9 +289,8 @@ async function searchEventService(request, reply, done) {
       reply.send({
         success: true,
         message: "Events fetched successfully",
-        data: await Promise.all(events),
+        data: await Promise.all(paginatedEvents),
         totalEvents: events.length,
-        dataPanthon: await getTotalProjectsByEventId(9),
       });
     }
   } catch (error) {
@@ -414,6 +416,50 @@ async function getEventFeedbackService(request, reply, done) {
   }
 }
 
+async function getEventResultService(request, reply) {
+  const eventId = parseInt(request.params.eventId);
+  try {
+    const projects = await getEventProjects(eventId);
+
+    // Immediately respond if no projects are found
+    if (projects.length === 0) {
+      return reply.send({
+        success: false,
+        message: "Data not found",
+        data: null,
+      });
+    }
+
+    // Map projects to include total_virtual_money
+    const updatedProjectsPromises = projects.map((project) =>
+      getProjectVirtualMoney(project.id).then((total_virtual_money) => ({
+        ...project,
+        total_virtual_money,
+      }))
+    );
+
+    // Resolve all promises and then sort the projects
+    const updatedProjects = await Promise.all(updatedProjectsPromises);
+    const sortedProjects = updatedProjects.sort(
+      (a, b) => b.total_virtual_money - a.total_virtual_money
+    );
+
+    // Send the sorted projects as the response
+    reply.send({
+      success: true,
+      message: "Event Result fetched successfully",
+      data: sortedProjects, // Directly send sortedProjects, more concise and logical
+    });
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+}
+
 export {
   createEventService,
   deleteEventService,
@@ -426,4 +472,5 @@ export {
   checkEventRoleService,
   updateEventService,
   getEventFeedbackService,
+  getEventResultService,
 };
