@@ -92,4 +92,6 @@ export default async (fastify) => {
   fastify.get("/event-feedback/:eventId", getEventFeedbackService);
 
   fastify.get("/event-result/:eventId", getEventResultService);
+
+  fastify.get("/event-name/:eventId", getEventByEventIdService);
 };
