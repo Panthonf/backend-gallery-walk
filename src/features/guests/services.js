@@ -339,7 +339,7 @@ async function getProjectCommentsService(req, rep, done) {
   const { page, pageSize } = req.query;
 
   if (!projectId) {
-    rep.send({
+    return rep.send({
       success: false,
       message: "Project id not found",
       data: null,
@@ -354,14 +354,14 @@ async function getProjectCommentsService(req, rep, done) {
   const paginatedEvents = projectComments.slice(start, end);
 
   if (paginatedEvents.length === 0) {
-    rep.send({
+    return rep.send({
       success: false,
       message: "Cannot get project comments",
       data: null,
     });
   }
 
-  rep.send({
+  return rep.send({
     success: true,
     message: "Project comments fetched successfully",
     data: paginatedEvents,
