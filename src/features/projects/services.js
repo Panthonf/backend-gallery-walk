@@ -374,6 +374,9 @@ const addProjectDocumentService = async (req, rep) => {
         "document-bucket",
         filename,
         part.file,
+        {
+          contentDisposition: "inline",
+        },
         function (err, etag) {
           if (err) {
             success.push(false);
