@@ -76,7 +76,8 @@ async function getProjectByUserIdService(req, reply) {
     const projects = paginatedProjects.map(async (project) => {
       const virtualMoney = await getProjectVirtualMoney(project.id);
       const eventData = await getEventByEventId(project.event_id);
-      return { ...project, virtual_money: virtualMoney, event_data: eventData };
+      const projectImages = await getProjectImages(project.id);
+      return { ...project, virtual_money: virtualMoney, event_data: eventData, project_image: projectImages};
     });
 
     if (projects.length === 0) {
