@@ -109,12 +109,18 @@ const saveVirtualMoney = async (guestId, eventId) => {
   return guest;
 };
 
-async function addProjectVirtualMoney(virtualMoney, projectId, eventId) {
+async function addProjectVirtualMoney(
+  virtualMoney,
+  projectId,
+  eventId,
+  guestId
+) {
   try {
     const existingProject = await prisma.virtual_moneys.findFirst({
       where: {
         project_id: projectId,
         event_id: eventId,
+        guest_id: guestId,
       },
       select: {
         amount: true,
@@ -128,6 +134,7 @@ async function addProjectVirtualMoney(virtualMoney, projectId, eventId) {
           project_id: projectId,
           amount: virtualMoney,
           event_id: eventId,
+          guest_id: guestId,
         },
         select: {
           amount: true,
@@ -141,6 +148,7 @@ async function addProjectVirtualMoney(virtualMoney, projectId, eventId) {
         where: {
           id: existingProject.id,
           event_id: eventId,
+          guest_id: guestId,
         },
         data: {
           amount: newAmount,
@@ -192,7 +200,9 @@ async function updateGuestVirtualMoney(virtualMoney, guestId) {
 async function addProjectComment(projectId, comment) {
   const newComment = await prisma.comments.create({
     data: {
-      comment: comment,
+      comment_like: comment.comment_like,
+      comment_better: comment.comment_better,
+      comment_idea: comment.comment_idea,
       project_id: projectId,
     },
   });
@@ -206,7 +216,9 @@ async function getProjectComments(projectId) {
     },
     select: {
       id: true,
-      comment: true,
+      comment_like: true,
+      comment_better: true,
+      comment_idea: true,
       created_at: true,
     },
     orderBy: {
@@ -241,6 +253,20 @@ async function deleteGuestVirtualMoneyService(guestId, eventId) {
   return updatedGuest;
 }
 
+async function getAlreadyGivenVirtualMoney(projectId, eventId, guestId) {
+  const virtualMoney = await prisma.virtual_moneys.findFirst({
+    where: {
+      project_id: projectId,
+      event_id: eventId,
+      guest_id: guestId,
+    },
+    select: {
+      amount: true,
+    },
+  });
+  return virtualMoney;
+}
+
 export {
   getEventByEventId,
   getAllEvents,
@@ -254,4 +280,5 @@ export {
   addProjectComment,
   getProjectComments,
   deleteGuestVirtualMoneyService,
+  getAlreadyGivenVirtualMoney,
 };
