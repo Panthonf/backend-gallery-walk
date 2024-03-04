@@ -71,7 +71,7 @@ export default async (fastify) => {
   fastify.get(
     "/:eventId",
     { preValidation: [fastify.checkSessionMiddleware] },
-    getEventByEventIdService
+    getEventByEventIdService 
   );
   fastify.get(
     "/search",
