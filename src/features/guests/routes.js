@@ -11,6 +11,7 @@ import {
   giveVirtualMoneyService,
   addProjectCommentService,
   getProjectCommentsService,
+  getAlreadyGivenVirtualMoneyService,
 } from "./services.js";
 
 import { getAllEvents } from "./models.js";
@@ -122,4 +123,9 @@ export default async (fastify) => {
   fastify.post("/add-comment", addProjectCommentService);
 
   fastify.get("/get-project-comments", getProjectCommentsService);
+
+  fastify.get(
+    "/get-already-given-virtual-money",
+    getAlreadyGivenVirtualMoneyService
+  );
 };
