@@ -253,7 +253,7 @@ async function deleteGuestVirtualMoneyService(guestId, eventId) {
   return updatedGuest;
 }
 
-async function getAlreadyGivenVirtualMoney(projectId, eventId, guestId) {
+async function getAlreadyGivenVirtualMoney(projectId, guestId, eventId) {
   const virtualMoney = await prisma.virtual_moneys.findFirst({
     where: {
       project_id: projectId,
