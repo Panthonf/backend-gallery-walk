@@ -17,10 +17,10 @@ services:
       - CALLBACK_URI_FACEBOOK=https://gwalk.cpe.eng.cmu.ac.th/api/login/facebook/callback
       - SECRET_KEY=fiaopfjiapfjiodamijioiofanninfdafsgwtrsgyrwtgrmioqtjip9erwtirwijijij
       - FRONTEND_URL=https://gwalk.cpe.eng.cmu.ac.th
-      - MINIO_ENDPOINT=minio-server-y3ut.onrender.com
-      - MINIO_URL=https://minio-server-y3ut.onrender.com
-      - MINIO_ACCESSKEY=HMCsik4bXKQ9Errj7Lut
-      - MINIO_SECRETKEY=C043wmQMy4NxSa1VifZk6oUiuYDrTmVgzHxvQ49X
+      - MINIO_ENDPOINT=obs.cpe.eng.cmu.ac.th
+      - MINIO_URL=https://obs.cpe.eng.cmu.ac.th
+      - MINIO_ACCESSKEY=GyDcHQ2zr9NmI3tHqQ6M
+      - MINIO_SECRETKEY=uhAbLe9O26RPkyc08FmdF6QKP26H8ibD40JsTprG
       - MINIO_PORT=443
       - MINIO_USESSL=true
       - CALLBACK_URI_GUEST=https://gwalk.cpe.eng.cmu.ac.th/api/guests/login/google/callback
@@ -35,8 +35,7 @@ services:
 #       - POSTGRES_USER=myuser
 #       - POSTGRES_PASSWORD=mypassword
 #     ports:
-#       - "5432:5432"
-#     volumes:
+#       - "5432:5432"#     volumes:
 #       - postgres_data:/var/lib/postgresql/data
 
 #   adminer:
