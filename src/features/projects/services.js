@@ -77,7 +77,12 @@ async function getProjectByUserIdService(req, reply) {
       const virtualMoney = await getProjectVirtualMoney(project.id);
       const eventData = await getEventByEventId(project.event_id);
       const projectImages = await getProjectImages(project.id);
-      return { ...project, virtual_money: virtualMoney, event_data: eventData, project_image: projectImages};
+      return {
+        ...project,
+        virtual_money: virtualMoney,
+        event_data: eventData,
+        project_image: projectImages,
+      };
     });
 
     if (projects.length === 0) {
@@ -363,7 +368,7 @@ const deleteProjectImageService = async (req, rep) => {
 
 const addProjectDocumentService = async (req, rep) => {
   const projectId = parseInt(req.params.projectId);
-  const parts = req.files();
+  const parts = req.files({ limits: { fileSize: 5 * 1024 * 1024 } });
   const files = [];
 
   const success = [];
@@ -371,19 +376,32 @@ const addProjectDocumentService = async (req, rep) => {
     if (part.file) {
       const filename = `${projectId}-${part.filename}`;
       files.push({ filename: filename });
-      minioClient.putObject(
-        "document-bucket",
-        filename,
-        part.file,
-        {
-          contentDisposition: "inline",
-        },
-        function (err, etag) {
-          if (err) {
-            success.push(false);
+      if (part.filename.split(".").pop() === "pdf") {
+        minioClient.putObject(
+          "document-bucket",
+          filename,
+          part.file,
+          {
+            "Content-Type": "application/pdf",
+          },
+          function (err, etag) {
+            if (err) {
+              success.push(false);
+            }
           }
-        }
-      );
+        );
+      } else {
+        minioClient.putObject(
+          "document-bucket",
+          filename,
+          part.file,
+          function (err, etag) {
+            if (err) {
+              success.push(false);
+            }
+          }
+        );
+      }
       const documentData = {
         project_id: projectId,
         document_name: filename,
