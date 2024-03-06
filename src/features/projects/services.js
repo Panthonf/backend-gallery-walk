@@ -15,6 +15,7 @@ import {
   deleteProjectImage,
   addProjectDocument,
   deleteProjectDocument,
+  deleteProject,
 } from "./models.js";
 
 async function createProjectService(req, reply, done) {
@@ -472,6 +473,30 @@ const deleteProjectDocumentService = async (req, rep) => {
   }
 };
 
+const deleteProjectService = async (req, rep) => {
+  const projectId = parseInt(req.params.projectId);
+  try {
+    const data = await deleteProject(projectId);
+    if (data == null) {
+      rep.send({
+        message: "not found project",
+        success: false,
+        data: null,
+      });
+    }
+    rep.send({
+      message: "deleted project successfully",
+      success: true,
+      data: data,
+    });
+  } catch (err) {
+    rep.send({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+};
 export {
   createProjectService,
   addProjectMemberService,
@@ -486,4 +511,5 @@ export {
   deleteProjectImageService,
   addProjectDocumentService,
   deleteProjectDocumentService,
+  deleteProjectService,
 };
