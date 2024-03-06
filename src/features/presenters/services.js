@@ -56,10 +56,6 @@ async function createProjectService(req, rep) {
 async function getProjectByEventIdService(req, rep) {
   try {
     const eventId = parseInt(req.params.eventId);
-    const { query, page, pageSize } = req.query;
-
-    const start = (page - 1) * pageSize;
-    const end = page * pageSize;
 
     if (!eventId) {
       rep.send({
@@ -78,7 +74,7 @@ async function getProjectByEventIdService(req, rep) {
       });
     }
 
-    const allProjects = await getProjectByEventId(eventId, query);
+    const allProjects = await getProjectByEventId(eventId);
     if (allProjects.length < 1) {
       rep.send({
         success: false,
@@ -87,37 +83,35 @@ async function getProjectByEventIdService(req, rep) {
       });
     }
 
-    const project = allProjects.slice(start, end);
-
     // Check if user is logged in
     const userSession = await req.session.get("user");
 
-    for (let i = 0; i < project.length; i++) {
-      const projectImages = await getProjectImages(project[i].id);
-      const projectDocuments = await getProjectDocuments(project[i].id);
-      project[i].project_image = projectImages;
-      project[i].project_document = projectDocuments;
+    for (let i = 0; i < allProjects.length; i++) {
+      const projectImages = await getProjectImages(allProjects[i].id);
+      const projectDocuments = await getProjectDocuments(allProjects[i].id);
+      allProjects[i].project_image = projectImages;
+      allProjects[i].project_document = projectDocuments;
     }
 
     if (userId.user_id !== userSession) {
       rep.send({
         success: true,
         message: "Project fetched successfully gg",
-        data: project,
+        data: allProjects,
         // userSession: userSession,
         // userId: userId.user_id,
       });
     }
 
-    for (let i = 0; i < project.length; i++) {
-      const virtualMoney = await getProjectVirtualMoney(project[i].id);
-      project[i].virtual_money = virtualMoney;
+    for (let i = 0; i < allProjects.length; i++) {
+      const virtualMoney = await getProjectVirtualMoney(allProjects[i].id);
+      allProjects[i].virtual_money = virtualMoney;
     }
 
     rep.send({
       success: true,
       message: "Project fetched successfully",
-      data: project,
+      data: allProjects,
     });
   } catch (error) {
     rep.send({
