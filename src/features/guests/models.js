@@ -267,6 +267,16 @@ async function getAlreadyGivenVirtualMoney(projectId, guestId, eventId) {
   return virtualMoney;
 }
 
+const checkGuestAlreadyAccess = async (guestId, eventId) => {
+  const guest = await prisma.virtual_moneys.findFirst({
+    where: {
+      event_id: eventId,
+      guest_id: guestId,
+    },
+  });
+  return guest;
+};
+
 export {
   getEventByEventId,
   getAllEvents,
@@ -281,4 +291,5 @@ export {
   getProjectComments,
   deleteGuestVirtualMoneyService,
   getAlreadyGivenVirtualMoney,
+  checkGuestAlreadyAccess,
 };
