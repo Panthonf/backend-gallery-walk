@@ -189,6 +189,16 @@ const deleteProjectDocument = async (projectId, projectDocument) => {
   return document;
 };
 
+const deleteProject = async (projectId) => {
+  const project = await prisma.projects.delete({
+    where: {
+      id: projectId,
+    },
+  });
+
+  return project;
+};
+
 export {
   createProject,
   addProjectMember,
@@ -203,4 +213,5 @@ export {
   deleteProjectImage,
   addProjectDocument,
   deleteProjectDocument,
+  deleteProject,
 };
