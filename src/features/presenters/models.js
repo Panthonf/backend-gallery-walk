@@ -13,23 +13,9 @@ async function createProject(userId, eventId, projectData) {
   return project;
 }
 
-async function getProjectByEventId(eventId, query) {
+async function getProjectByEventId(eventId) {
   const projects = await prisma.projects.findMany({
     where: {
-      OR: [
-        {
-          title: {
-            contains: query,
-            mode: "insensitive",
-          },
-        },
-        {
-          description: {
-            contains: query,
-            mode: "insensitive",
-          },
-        },
-      ],
       event_id: eventId,
     },
     orderBy: {
@@ -98,7 +84,7 @@ const getProjectDocuments = async (projectId) => {
     },
   });
   return projectDocuments;
-}
+};
 
 export {
   createProject,
@@ -107,5 +93,5 @@ export {
   getProjectVirtualMoney,
   uploadProjectImage,
   getProjectImages,
-  getProjectDocuments
+  getProjectDocuments,
 };
