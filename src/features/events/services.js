@@ -358,6 +358,7 @@ const checkEventRoleService = async (request, reply, done) => {
           success: true,
           message: "Participant",
           role: "presenter",
+          user_id: userId,
         });
       }
     }
