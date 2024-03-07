@@ -66,6 +66,9 @@ async function searchProjectByEventId(eventId) {
     where: {
       event_id: eventId,
     },
+    orderBy: {
+      created_at: "desc",
+    },
   });
   return projects;
 }
