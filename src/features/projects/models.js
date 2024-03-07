@@ -61,27 +61,10 @@ async function getProjectsByEventId(eventId) {
   return projects;
 }
 
-async function searchProjectByEventId(searchData, eventId) {
+async function searchProjectByEventId(eventId) {
   const projects = await prisma.projects.findMany({
     where: {
-      OR: [
-        {
-          title: {
-            contains: searchData,
-            mode: "insensitive",
-          },
-        },
-        {
-          description: {
-            contains: searchData,
-            mode: "insensitive",
-          },
-        },
-      ],
       event_id: eventId,
-    },
-    orderBy: {
-      created_at: "desc",
     },
   });
   return projects;
