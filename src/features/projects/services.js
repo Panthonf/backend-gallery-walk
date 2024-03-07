@@ -136,12 +136,9 @@ async function getProjectByEventIdService(req, reply) {
 
 async function searchProjectService(request, reply, done) {
   try {
-    const { query, page, pageSize } = request.query;
+    // const { query, page, pageSize } = request.query;
     const eventId = parseInt(request.params.eventId);
-    const allProjects = await searchProjectByEventId(query, eventId);
-
-    const start = (page - 1) * pageSize;
-    const end = page * pageSize;
+    const allProjects = await searchProjectByEventId(eventId);
 
     for (let i = 0; i < allProjects.length; i++) {
       const projectImages = await getProjectImages(allProjects[i].id);
@@ -150,9 +147,9 @@ async function searchProjectService(request, reply, done) {
       allProjects[i].project_document = projectDocuments;
     }
 
-    const paginatedEvents = allProjects.slice(start, end);
+    // const paginatedEvents = allProjects.slice(start, end);
 
-    if (paginatedEvents.length === 0) {
+    if (allProjects.length === 0) {
       reply.status(404).send({
         success: false,
         message: "No projects found",
@@ -162,7 +159,7 @@ async function searchProjectService(request, reply, done) {
       reply.send({
         success: true,
         message: "Projects fetched successfully",
-        data: paginatedEvents,
+        data: allProjects,
         totalProjects: allProjects.length,
       });
     }
