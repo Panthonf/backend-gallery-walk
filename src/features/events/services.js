@@ -352,6 +352,7 @@ const checkEventRoleService = async (request, reply, done) => {
           success: true,
           message: "Event Manager",
           role: "manager",
+          user_id: userId,
         });
       } else {
         reply.send({
