@@ -10,7 +10,8 @@ import {
   checkEventRoleService,
   updateEventService,
   getEventFeedbackService,
-  getEventResultService
+  getEventResultService,
+  getEventSummaryService,
 } from "./services.js";
 
 const schema = {
@@ -71,7 +72,7 @@ export default async (fastify) => {
   fastify.get(
     "/:eventId",
     { preValidation: [fastify.checkSessionMiddleware] },
-    getEventByEventIdService 
+    getEventByEventIdService
   );
   fastify.get(
     "/search",
@@ -94,4 +95,6 @@ export default async (fastify) => {
   fastify.get("/event-result/:eventId", getEventResultService);
 
   fastify.get("/event-name/:eventId", getEventByEventIdService);
+
+  fastify.get("/event-summary/:eventId", getEventSummaryService);
 };
