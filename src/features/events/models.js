@@ -203,6 +203,164 @@ const getEventProjects = async (eventId) => {
   return projects;
 };
 
+const getTotalGiveVirtualMoney = async (eventId) => {
+  const totalGiveVirtualMoney = await prisma.virtual_moneys.groupBy({
+    by: ["guest_id"],
+    where: {
+      event_id: eventId,
+    },
+  });
+  return totalGiveVirtualMoney.length;
+};
+
+const getTotalGiveComments = async (eventId) => {
+  const getProjectId = await prisma.projects.findMany({
+    where: {
+      event_id: eventId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const projectId = getProjectId.map((project) => project.id);
+
+  const totalGiveComments = await prisma.comments.groupBy({
+    by: ["project_id"],
+    where: {
+      project_id: {
+        in: projectId,
+      },
+    },
+  });
+
+  return totalGiveComments.length;
+};
+
+const getTotalEventComments = async (eventId) => {
+  const getProjectId = await prisma.projects.findMany({
+    where: {
+      event_id: eventId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const projectId = getProjectId.map((project) => project.id);
+
+  const totalEventComments = await prisma.comments.count({
+    where: {
+      project_id: {
+        in: projectId,
+      },
+    },
+  });
+
+  return totalEventComments;
+};
+
+const getProjectsRanking = async (eventId) => {
+  const projectId = await prisma.projects.findMany({
+    where: {
+      event_id: eventId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const projectIds = projectId.map((project) => project.id);
+
+  const projectsRanking = await prisma.virtual_moneys.groupBy({
+    by: ["project_id"],
+    where: {
+      project_id: {
+        in: projectIds,
+      },
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  const projectsRankingData = projectsRanking.map((project) => {
+    return {
+      project_id: project.project_id,
+      amount: project._sum.amount,
+    };
+  });
+
+  const projectData = await Promise.all(
+    projectsRankingData.map(async (project) => {
+      const projectInfo = await prisma.projects.findUnique({
+        where: {
+          id: project.project_id,
+        },
+        select: {
+          id: true,
+          title: true,
+        },
+      });
+
+      return {
+        ...project,
+        title: projectInfo.title,
+      };
+    })
+  );
+
+  return projectData.sort((a, b) => b.amount - a.amount);
+};
+
+const getProjectsNotRanked = async (eventId) => {
+  const projectId = await prisma.projects.findMany({
+    where: {
+      event_id: eventId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const projectIds = projectId.map((project) => project.id);
+
+  const filterProjectRanking = await prisma.virtual_moneys.findMany({
+    where: {
+      project_id: {
+        in: projectIds,
+      },
+    },
+  });
+
+  const filterNotRanked = projectIds.filter((project) => {
+    return !filterProjectRanking.some(
+      (rankedProject) => rankedProject.project_id === project
+    );
+  });
+
+
+  const projectData = await Promise.all(
+    filterNotRanked.map(async (project) => {
+      const projectInfo = await prisma.projects.findUnique({
+        where: {
+          id: project,
+        },
+        select: {
+          id: true,
+          title: true,
+        },
+      });
+
+      return {
+        ...projectInfo,
+      };
+    })
+  );
+
+  return projectData;
+};
+
 export {
   createEvent,
   deleteEvent,
@@ -217,4 +375,9 @@ export {
   deleteThumbnail,
   getEventTotalVirtualMoney,
   getEventProjects,
+  getTotalGiveVirtualMoney,
+  getTotalGiveComments,
+  getTotalEventComments,
+  getProjectsRanking,
+  getProjectsNotRanked,
 };
