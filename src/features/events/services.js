@@ -14,6 +14,11 @@ import {
   deleteThumbnail,
   getEventTotalVirtualMoney,
   getEventProjects,
+  getTotalGiveVirtualMoney,
+  getTotalGiveComments,
+  getTotalEventComments,
+  getProjectsRanking,
+  getProjectsNotRanked,
 } from "./models.js";
 
 async function createEventService(req, reply, done) {
@@ -462,6 +467,42 @@ async function getEventResultService(request, reply) {
   }
 }
 
+const getEventSummaryService = async (req, rep) => {
+  try {
+    const eventId = parseInt(req.params.eventId);
+    const totalProjects = await getTotalProjectsByEventId(eventId);
+    const totalGiveVirtualMoney = await getTotalGiveVirtualMoney(eventId);
+    const totalGiveComments = await getTotalGiveComments(eventId);
+    const totalVirtualMoney = await getEventTotalVirtualMoney(eventId);
+    const totalComments = await getTotalEventComments(eventId);
+    const event = await getEventByEventId(eventId);
+    const projectsRanking = await getProjectsRanking(eventId);
+
+    const projectsNotRanked = await getProjectsNotRanked(eventId);
+
+    rep.send({
+      success: true,
+      message: "Event Summary fetched successfully",
+      data: {
+        totalProjects: totalProjects || 0,
+        totalGiveVirtualMoney: totalGiveVirtualMoney || 0,
+        totalGiveComments: totalGiveComments || 0,
+        totalVirtualMoney: totalVirtualMoney || 0,
+        event: event || null,
+        totalComments: totalComments || 0,
+        projectsRanking: projectsRanking || [],
+        projectsNotRanked: projectsNotRanked || [],
+      },
+    });
+  } catch (error) {
+    rep.status(500).send({
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export {
   createEventService,
   deleteEventService,
@@ -475,4 +516,5 @@ export {
   updateEventService,
   getEventFeedbackService,
   getEventResultService,
+  getEventSummaryService,
 };
